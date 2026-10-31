@@ -1,0 +1,36 @@
+layout (local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
+layout (rg16f) uniform image2D waveImg;
+
+const ivec3 workGroups = ivec3(1, 1024, 1);
+
+#include "../InternalLib/Syntax.glsl"
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Debug.glsl"
+
+uniform float frameTimeCounter;
+uniform float rainStrength;
+
+#include "../InternalLib/Common/Rand.glsl"
+#include "../InternalLib/Common/Complex.glsl"
+#include "../InternalLib/Common/FFT.glsl"
+#include "../InternalLib/Common/Tessendorf.glsl"
+
+void main() {
+    ivec2 iPos = ivec2(gl_GlobalInvocationID.xy);
+    InitRand(uint(gl_GlobalInvocationID.x + 1024 * gl_GlobalInvocationID.y));
+
+    vec2 k = GetWaveFieldCoord(ShiftCoordinates(iPos));
+    Complex waveAmplitudes = ComputeWaveAmplitudes(k, TIME * WATER_SPEED_MULT);
+
+    RowPreload(iPos, waveAmplitudes);
+    barrier();
+
+    for (int i = 1; i <= 10; i++) {
+        barrier();
+        Complex result = FFT(iPos.x, 1024, i, true);
+        barrier();
+        sharedBuffer[iPos.x] = result;
+    }
+
+    imageStore(waveImg, iPos, vec4(sharedBuffer[iPos.x].re, sharedBuffer[iPos.x].im, 0.0, 0.0));
+}

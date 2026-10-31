@@ -1,0 +1,122 @@
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+layout (rgba16f) uniform image2D cloudImg;
+layout (rg16f) uniform image2D colorimg13;
+
+const vec2 workGroupsRender = vec2(0.25, 0.25);
+
+#include "/InternalLib/Syntax.glsl"
+
+uniform sampler3D cloudNoiseTex;
+uniform sampler3D curlNoiseTex;
+
+uniform sampler2D skyScatteringTex;
+uniform sampler2D skyTransmittanceTex;
+
+uniform sampler3D lightPropagationVolume_r;
+
+uniform sampler2D vxDepthTexOpaque;
+uniform sampler2D depthTexFront, depthTexBack;
+
+uniform sampler2D colortex2;
+uniform sampler2D colortex3;
+uniform sampler2D colortex9;
+uniform sampler2D colortex10;
+
+uniform sampler2D shadowtex0, shadowtex1;
+uniform sampler2D shadowcolor, shadowcolor1;
+
+uniform sampler2D noisetex;
+uniform sampler2D blueNoiseTex;
+uniform sampler2D curlNoiseTex2D;
+
+uniform mat4 shadowModelView, shadowModelViewInverse;
+uniform mat4 shadowProjection, shadowProjectionInverse;
+
+uniform vec3 cameraPosition, previousCameraPosition;
+uniform vec3 sunPosition;
+uniform vec3 upPosition;
+
+uniform vec2 viewDimensions;
+
+uniform ivec2 eyeBrightnessSmooth;
+
+uniform float eyeAltitude;
+uniform float wetness;
+uniform float frameTimeCounter;
+uniform float frameTime;
+
+uniform int frameCounter;
+uniform float viewWidth, viewHeight;
+uniform int heldItemId;
+uniform int worldTime;
+uniform int isEyeInWater;
+
+#define composite0 // stupid library requires this.
+
+#include "../InternalLib/Debug.glsl"
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Uniform/Matrices.glsl"
+#include "../InternalLib/Common/SpaceConversions.glsl"
+#include "../InternalLib/Common/Rand.glsl"
+#include "../InternalLib/Fragment/Sky.fsh"
+#include "../InternalLib/Common/Voxelization.glsl"
+#include "../InternalLib/Fragment/Clouds.fsh"
+#include "../InternalLib/Fragment/VolumetricRenderer.fsh"
+
+float SampleDepthMax10x10(ivec2 iPos) {
+    float maxDepth = -1.0;
+
+    for (int y = -5; y <= 5; ++y) {
+        for (int x = -5; x <= 5; ++x) {
+            ivec2 center = iPos + ivec2(x, y);
+
+            float depth = texelFetch(depthTexBack, center, 0).x;
+
+            maxDepth = max(maxDepth, depth);
+        }
+    }
+
+    return maxDepth;
+}
+
+vec2 CalculateCloudMotionVectors(vec2 nCoord, vec3 worldPos) {
+    vec2 windDir2D = normalize(VOLUMETRIC_CLOUDS_WIND_DIR.xz);
+
+	vec3 projection = worldPos;
+         projection.xz -= windDir2D * TIME_SPEED * VOLUMETRIC_CLOUDS_SPEED * frameTime * (VOLUMETRIC_CLOUDS_SCALE * (cloudAltitude + cloudHeight));
+    
+    projection = (cameraPosition - previousCameraPosition) + projection;
+    projection = mat3(CameraTransformsPrevious.viewMatrix) * projection + CameraTransformsPrevious.viewMatrix[3].xyz;
+    projection = (diagonal3(CameraTransformsPrevious.projectionMatrix) * projection + CameraTransformsPrevious.projectionMatrix[3].xyz) / -projection.z * 0.5 + 0.5;
+
+	return (nCoord - projection.xy);
+}
+
+void main() {
+    InitRand(uint(gl_GlobalInvocationID.x + viewWidth * gl_GlobalInvocationID.y) + (uint(viewWidth) * uint(viewHeight) * floatBitsToUint(frameTimeCounter)));
+
+    ivec2 iPos = ivec2(gl_GlobalInvocationID.xy);
+    vec2 nCoord = (iPos + 0.5) / floor(viewDimensions * workGroupsRender);
+         nCoord += (CHECKER_OFFSETS_4x4[frameCounter % 16] / 4.0) / (viewDimensions * workGroupsRender);
+
+    float depth = SampleDepthMax10x10(ivec2(nCoord * viewDimensions)).x;
+    float dither = BlueNoiseTemporal(blueNoiseTex, iPos, frameCounter);
+
+    mat2x3 position;
+    position[0] = CalculateViewSpacePositionUnjittered(vec3(nCoord, depth));
+    position[1] = CalculateWorldSpacePosition(position[0]);
+
+    float normFactor = inversesqrt(dot(position[0], position[0]));
+	vec3 viewVector = normFactor * -position[0];
+    vec3 worldVector = normalize(position[1] - CameraTransforms.viewMatrixInverse[3].xyz);
+
+    float VoL = dot(-viewVector, SceneData.lightVector);
+
+    VolumetricData vd = CalculateVolumetricVariables(viewVector, VoL);
+
+    vec4 clouds = CalculateVolumetricClouds(worldVector, depth, dither, length(position[1]), VOLUMETRIC_CLOUDS_QUALITY, VOLUMETRIC_CLOUDS_DIRECT_QUALITY, true, false);
+    vec2 motionVector = CalculateCloudMotionVectors(nCoord, worldVector * clouds.a);
+
+    imageStore(cloudImg, iPos, clouds);
+    imageStore(colorimg13, iPos, vec4(motionVector, 0.0, 0.0));
+}

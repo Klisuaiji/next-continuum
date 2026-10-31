@@ -1,0 +1,58 @@
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+layout(rgba16f) uniform image2D cloudImgUpscaled;
+
+const vec2 workGroupsRender = vec2(1.0, 1.0);
+
+#include "/InternalLib/Syntax.glsl"
+
+uniform sampler2D depthTexBack;
+uniform sampler2D depthTexBackHistory;
+uniform sampler2D cloudTex;
+uniform sampler2D cloudTexFeedback;
+uniform sampler2D colortex13;
+
+uniform vec3 previousCameraPosition, cameraPosition;
+
+uniform vec2 viewDimensions;
+
+uniform int frameCounter;
+
+uniform float viewWidth, viewHeight;
+uniform float frameTime;
+
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Debug.glsl"
+#include "../InternalLib/Uniform/Matrices.glsl"
+#include "../InternalLib/Common/SpaceConversions.glsl"
+
+bool GetDepthRejection(vec2 nCoord) {
+    float linearD = ScreenToViewSpaceDepth(texture(depthTexBack, nCoord).x);
+    float prevLinearD = ScreenToViewSpaceDepth(texture(depthTexBackHistory, nCoord).x);
+
+    return abs(linearD - prevLinearD) > 10.0;
+}
+
+void main() {
+    ivec2 iPos = ivec2(gl_GlobalInvocationID);
+    vec2 nCoord = (iPos + 0.5) / floor(viewDimensions * workGroupsRender);
+
+    vec2 dejitteredCoord = nCoord;
+    vec2 reprojectedCoord = nCoord - texture(colortex13, dejitteredCoord).xy;
+
+    float cameraVelocity = distance(previousCameraPosition, cameraPosition) / frameTime;
+
+    ivec2 offsetCoord = iPos % 4;
+    ivec2 checkerCoord = CHECKER_OFFSETS_4x4[frameCounter % 16];
+
+    vec4 currentSample = texelFetch(cloudTex, clamp(iPos / 4, ivec2(0), ivec2(viewDimensions * 0.25) - 1), 0);
+    vec4 previousSample = mix(currentSample, texture(cloudTexFeedback, reprojectedCoord), exp(-0.002 * cameraVelocity));
+
+    bool disocclusion = clamp01(reprojectedCoord) != reprojectedCoord || SceneData.sceneChange || GetDepthRejection(nCoord);
+    bool isCurrentPixel = offsetCoord != checkerCoord;
+    vec4 newSample = vec4(0.0, 0.0, 1.0, 1e9);
+
+    if (isCurrentPixel) newSample = previousSample;
+    if (!isCurrentPixel || disocclusion) newSample = currentSample;
+
+    imageStore(cloudImgUpscaled, iPos, newSample);
+}

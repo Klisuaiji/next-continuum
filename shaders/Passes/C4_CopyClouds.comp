@@ -1,0 +1,17 @@
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+layout (rgba16f) uniform image2D cloudImgFeedback;
+layout (r32f) uniform image2D depthImgBackHistory;
+
+const vec2 workGroupsRender = vec2(1.0, 1.0);
+
+#include "/InternalLib/Syntax.glsl"
+
+uniform sampler2D cloudTexUpscaled;
+uniform sampler2D depthTexBack;
+
+void main() {
+    ivec2 iPos = ivec2(gl_GlobalInvocationID);
+
+    imageStore(cloudImgFeedback, iPos, texelFetch(cloudTexUpscaled, iPos, 0));
+    imageStore(depthImgBackHistory, iPos, texelFetch(depthTexBack, iPos, 0));
+}

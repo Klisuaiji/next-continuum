@@ -1,0 +1,58 @@
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+layout (r32f) uniform image2D depthImgFront;
+layout (r32f) uniform image2D depthImgBack;
+
+const vec2 workGroupsRender = vec2(1.0, 1.0);
+
+#define DISABLE_MATRIX_OVERRIDE
+
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Syntax.glsl"
+#include "../InternalLib/Common/SpaceConversions.glsl"
+
+uniform sampler2D depthtex0, depthtex1;
+uniform sampler2D vxDepthTexOpaque, vxDepthTexTrans;
+
+uniform mat4 vxProj, vxProjInv;
+uniform mat4 gbufferProjection, gbufferProjectionInverse;
+
+uniform vec2 viewDimensions;
+
+void main() {
+    ivec2 iPos = ivec2(gl_GlobalInvocationID.xy);
+    vec2 texcoord = (iPos + 0.5) / floor(viewDimensions * workGroupsRender);
+
+    #ifdef VOXY
+        float frontDepthDH = texture(vxDepthTexTrans, texcoord).x;
+        vec3 frontDHView = CalculateViewSpacePosition(vec3(texcoord, frontDepthDH), vxProjInv);
+
+        float frontDepthMc = texture(depthtex0, texcoord).x;
+        vec3 frontMcView = CalculateViewSpacePosition(vec3(texcoord, frontDepthMc), CameraTransforms.projectionMatrixInverse);
+
+        float backDepthDH = texture(vxDepthTexOpaque, texcoord).x;
+        vec3 backDHView = CalculateViewSpacePosition(vec3(texcoord, backDepthDH), vxProjInv);
+
+        float backDepthMc = texture(depthtex1, texcoord).x;
+        vec3 backMcView = CalculateViewSpacePosition(vec3(texcoord, backDepthMc), CameraTransforms.projectionMatrixInverse);
+
+        vec3 frontView = abs(frontMcView.z) > abs(frontDHView.z) ? frontDHView : frontMcView; 
+        vec3 backView = abs(backMcView.z) > abs(backDHView.z) ? backDHView : backMcView; 
+
+        float frontDepthSS = ViewSpaceToScreenSpace(frontView, CameraTransforms.projectionMatrix).z;
+        float backDepthSS = ViewSpaceToScreenSpace(backView, CameraTransforms.projectionMatrix).z;
+
+        if (backDepthMc >= 1.0 && backDepthDH >= 1.0) {
+            backDepthSS = 1.0;
+        }
+
+        if (frontDepthMc >= 1.0 && frontDepthDH >= 1.0) {
+            frontDepthSS = 1.0;
+        }
+
+        imageStore(depthImgFront, iPos, vec4(frontDepthSS));
+        imageStore(depthImgBack, iPos, vec4(backDepthSS));
+    #else 
+        imageStore(depthImgFront, iPos, texture(depthtex0, texcoord));
+        imageStore(depthImgBack, iPos, texture(depthtex1, texcoord));
+    #endif
+}

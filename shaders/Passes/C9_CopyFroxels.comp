@@ -1,0 +1,24 @@
+layout (local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
+layout (r11f_g11f_b10f) uniform image3D integratedScatteringImg;
+layout (r11f_g11f_b10f) uniform image3D integratedTransmittanceImg;
+
+const ivec3 workGroups = ivec3(64, 32, 8);
+
+uniform sampler3D froxelScattering;
+uniform sampler3D froxelTransmittance;
+
+#include "../InternalLib/Syntax.glsl"
+#include "../InternalLib/Utilities.glsl"
+
+void main() {    
+    ivec3 iPos = ivec3(gl_GlobalInvocationID);
+
+    #ifndef VOLUMETRIC_LIGHT 
+        imageStore(integratedScatteringImg, iPos, vec4(0.0));
+        imageStore(integratedTransmittanceImg, iPos, vec4(1.0));
+        return;
+    #endif
+
+    imageStore(integratedScatteringImg, iPos, texelFetch(froxelScattering, iPos, 0));
+    imageStore(integratedTransmittanceImg, iPos, texelFetch(froxelTransmittance, iPos, 0));
+}

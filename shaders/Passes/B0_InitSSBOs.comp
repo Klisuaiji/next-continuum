@@ -1,0 +1,97 @@
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+const ivec3 workGroups = ivec3(1, 1, 1);
+
+uniform mat4 gbufferProjection, gbufferProjectionInverse;
+uniform mat4 gbufferModelView, gbufferModelViewInverse;
+
+uniform mat4 shadowModelView, shadowModelViewInverse;
+
+uniform vec3 sunPosition;
+uniform vec3 moonPosition;
+uniform vec3 shadowLightPosition;
+uniform vec3 upPosition;
+
+uniform float fov;
+uniform float near, far;
+uniform float aspectRatio;
+uniform float viewWidth, viewHeight;
+uniform float eyeAltitude;
+uniform float wetness;
+uniform float frameTimeCounter;
+
+uniform int frameCounter;
+uniform int vxRenderDistance;
+uniform int worldTime;
+
+uniform bool worldTimeChange;
+
+#define DISABLE_MATRIX_OVERRIDE
+
+#include "../InternalLib/Syntax.glsl"
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Uniform/Matrices.glsl"
+#include "../InternalLib/Debug.glsl"
+#include "../InternalLib/Fragment/Sky.fsh"
+
+void WriteCameraTransforms() {
+    // Update previous frame related data.
+    CameraTransformsPrevious.projectionMatrix = CameraTransforms.projectionMatrix;
+    CameraTransformsPrevious.projectionMatrixInverse = CameraTransforms.projectionMatrixInverse;
+    CameraTransformsPrevious.viewMatrix = CameraTransforms.viewMatrix;
+    CameraTransformsPrevious.viewMatrixInverse = CameraTransforms.viewMatrixInverse;
+
+    CameraTransforms.viewMatrix = gbufferModelView;
+    CameraTransforms.viewMatrixInverse = gbufferModelViewInverse;
+
+    #if defined VOXY
+        CameraTransforms.nearPlane = near;
+        CameraTransforms.farPlane = vxRenderDistance * 16.0;
+
+        CameraTransforms.projectionMatrix = GenPerspectiveMat(fov, aspectRatio, CameraTransforms.nearPlane, CameraTransforms.farPlane);
+        CameraTransforms.projectionMatrixInverse = inverse(CameraTransforms.projectionMatrix);
+    #else 
+        CameraTransforms.nearPlane = near;
+        CameraTransforms.farPlane = far;
+
+        CameraTransforms.projectionMatrix = gbufferProjection;
+        CameraTransforms.projectionMatrixInverse = gbufferProjectionInverse;
+    #endif
+
+    CameraTransforms.renderDistance = far;
+}
+
+void WriteCloudTransforms() {
+    CloudTransforms.projectionMatrix = GenOrthoMat(-CLOUD_SHADOWMAP_RADIUS, CLOUD_SHADOWMAP_RADIUS, -CLOUD_SHADOWMAP_RADIUS, CLOUD_SHADOWMAP_RADIUS, 0.0, 100000.0);
+    CloudTransforms.projectionMatrix[3].z -= 1.0;
+    CloudTransforms.projectionMatrixInverse = inverse(CloudTransforms.projectionMatrix);
+
+    CloudTransforms.viewMatrix = Mat3ToHomogenousMat4(mat3(shadowModelView));
+    CloudTransforms.viewMatrixInverse = Mat3ToHomogenousMat4(mat3(shadowModelViewInverse));
+}
+
+void WriteSceneData() {
+    SceneData.sunVector = sunPosition * 0.01;
+    SceneData.moonVector = moonPosition * 0.01;
+    SceneData.lightVector = (worldTime > 23075 || worldTime < 12925 ? SceneData.sunVector : -SceneData.sunVector);
+
+    SceneData.wSunVector = normalize(mat3(CameraTransforms.viewMatrixInverse) * SceneData.sunVector);
+    SceneData.wMoonVector = normalize(mat3(CameraTransforms.viewMatrixInverse) * SceneData.moonVector);
+    SceneData.wLightVector = normalize(mat3(CameraTransforms.viewMatrixInverse) * SceneData.lightVector);
+
+    vec3 viewAbsorb = vec3(1.0);
+
+	SceneData.sunColor = GetSunColorZom() + GetMoonColorZom();
+	SceneData.skyColor = vec3(0.0);
+	SceneData.skyColor = sky_atmosphere(vec3(0.0), upPosition * 0.01, upPosition * 0.01, SceneData.sunVector, SceneData.moonVector, sky_sunColor, sky_moonColor, 10, viewAbsorb);
+
+    SceneData.taaJitter = temporalJitter();
+
+    SceneData.transitionFading = 1.0;
+    SceneData.sceneChange = frameCounter < 16 || worldTimeChange;
+}
+
+void main() {
+    WriteCameraTransforms();
+    WriteCloudTransforms();
+    WriteSceneData();
+}

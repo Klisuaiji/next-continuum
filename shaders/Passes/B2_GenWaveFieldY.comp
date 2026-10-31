@@ -1,0 +1,27 @@
+layout (local_size_x = 1, local_size_y = 1024, local_size_z = 1) in;
+layout (rg16f) uniform image2D waveImg;
+
+const ivec3 workGroups = ivec3(1024, 1, 1);
+
+#include "../InternalLib/Syntax.glsl"
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Debug.glsl"
+#include "../InternalLib/Common/Complex.glsl"
+#include "../InternalLib/Common/FFT.glsl"
+
+uniform sampler2D waveTex;
+
+void main() {
+    ivec2 iPos = ivec2(gl_GlobalInvocationID.xy);
+
+    ColumnPreload(iPos, waveTex);
+
+    for (int i = 1; i <= 10; i++) {
+        barrier();
+        Complex result = FFT(iPos.y, 1024, i, true);
+        barrier();
+        sharedBuffer[iPos.y] = result;
+    }
+
+    imageStore(waveImg, iPos, vec4(sharedBuffer[iPos.y].re, sharedBuffer[iPos.y].im, 0.0, 0.0));
+}

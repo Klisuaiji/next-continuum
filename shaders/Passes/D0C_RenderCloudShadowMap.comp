@@ -1,0 +1,156 @@
+
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+layout (r16f) uniform image2D colorimg10;
+
+const ivec3 workGroups = ivec3(32, 32, 1);
+
+#define DISABLE_MATRIX_OVERRIDE
+#include "../InternalLib/Syntax.glsl"
+
+uniform sampler3D cloudNoiseTex;
+uniform sampler3D curlNoiseTex;
+
+uniform sampler2D skyScatteringTex;
+uniform sampler2D skyTransmittanceTex;
+
+uniform sampler3D lightPropagationVolume_r;
+
+uniform sampler2D vxDepthTexOpaque;
+uniform sampler2D depthTexFront, depthTexBack;
+
+uniform sampler2D colortex2;
+uniform sampler2D colortex3;
+uniform sampler2D colortex9;
+
+uniform sampler2D shadowtex0, shadowtex1;
+uniform sampler2D shadowcolor, shadowcolor1;
+
+uniform sampler2D noisetex;
+uniform sampler2D blueNoiseTex;
+
+uniform mat4 shadowModelView, shadowModelViewInverse;
+uniform mat4 shadowProjection, shadowProjectionInverse;
+
+uniform mat4 gbufferProjection, gbufferProjectionInverse;
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+
+uniform vec3 cameraPosition;
+uniform vec3 sunPosition;
+uniform vec3 upPosition;
+
+uniform vec2 viewDimensions;
+
+uniform ivec2 eyeBrightnessSmooth;
+
+uniform float eyeAltitude;
+uniform float wetness;
+uniform float frameTimeCounter;
+
+uniform int frameCounter;
+uniform float viewWidth, viewHeight;
+uniform int heldItemId;
+uniform int worldTime;
+uniform int isEyeInWater;
+
+#define composite0 // stupid library requires this.
+
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Debug.glsl"
+#include "../InternalLib/Uniform/Matrices.glsl"
+#include "../InternalLib/Common/SpaceConversions.glsl"
+#include "../InternalLib/Common/Rand.glsl"
+#include "../InternalLib/Fragment/Sky.fsh"
+#include "../InternalLib/Fragment/Clouds.fsh"
+
+float RenderCloudShadowMap(
+	vec3 cameraPos,
+    vec3 rayOrigin,
+    vec3 rayDirection,
+	float dither, 
+	const int steps
+) {
+	const float maxAltitude = cloudAltitude + cloudHeight;
+	const float cloudScale = cloudAltitude / 1600.0;
+
+	const VolumetricCloudSettings vcs = VolumetricCloudSettings(cloudAltitude, maxAltitude, cloudHeight, cloudCoverage, cloudDensity, cloudScale);
+	float rSteps = 1.0 / steps;
+
+    vec2 outerIntersection = rsi(
+        vec3(0.0, atmosphere_planetRadius, 0.0) + rayOrigin,
+        rayDirection,
+        atmosphere_planetRadius + vcs.maxAltitude
+    );
+
+    if (outerIntersection.y <= 0.0)
+        return 1.0;
+
+    vec2 innerIntersection = rsi(
+        vec3(0.0, atmosphere_planetRadius, 0.0) + rayOrigin,
+        rayDirection,
+        atmosphere_planetRadius + vcs.minAltitude
+    );
+
+    float startDistance = outerIntersection.x;
+    float endDistance   = innerIntersection.x;
+
+	vec3 startPos = startDistance * rayDirection;
+	vec3 endPos = endDistance * rayDirection;
+
+	vec3 increment = (endPos - startPos) / steps;
+	vec3 position = rayOrigin + startPos + increment * dither;
+
+    float transmittance = 1.0;
+
+	for (int i = 0; i < steps; i++, position += increment) {
+		float odSample = GetVolumetricClouds(position + vec3(cameraPos.x, 0.0, cameraPos.z), vcs, false) * vcs.cloudDensity * length(increment);
+		if (-odSample >= 0.0) continue;
+
+		float sampleTransmittance = exp2(-odSample * rLOG2);
+		transmittance *= sampleTransmittance;
+
+        if (transmittance < VOLUMETRIC_CLOUDS_MIN_TRANSMITTANCE) break;
+	}
+
+    transmittance = clamp01(remap(transmittance, VOLUMETRIC_CLOUDS_MIN_TRANSMITTANCE, 1.0, 0.0, 1.0));
+
+    return transmittance;
+}
+
+shared float previousData[16][16];
+
+void Preload() {
+    previousData[gl_LocalInvocationID.x][gl_LocalInvocationID.y] = imageLoad(colorimg10, ivec2(gl_GlobalInvocationID.xy)).x;
+}
+
+void main() {
+    #if (!defined VOLUMETRIC_CLOUDS) || (!defined VOLUMETRIC_CLOUDS_SHADOWS)
+        imageStore(colorimg10, ivec2(gl_GlobalInvocationID.xy), vec4(1.0));
+        return;
+    #endif
+    
+    InitRand(uint(gl_GlobalInvocationID.x + viewWidth * gl_GlobalInvocationID.y) + (uint(viewWidth) * uint(viewHeight) * floatBitsToUint(frameTimeCounter)));
+
+    Preload();
+    memoryBarrierShared();
+
+    ivec2 iPos = ivec2(gl_GlobalInvocationID);
+    vec2 nCoord = (iPos + 0.5) / vec2(workGroups * gl_WorkGroupSize);
+
+    vec3 viewPos = CalculateViewSpacePosition(vec3(nCoord, 0.0), CloudTransforms.projectionMatrixInverse);
+    vec3 viewPosOrtho = CalculateViewSpacePosition(vec3(0.5, 0.5, 0.0), CloudTransforms.projectionMatrixInverse);
+
+    vec3 worldPos = CalculateWorldSpacePosition(viewPos, CloudTransforms.viewMatrixInverse);
+
+    vec3 rayDir = normalize(mat3(CloudTransforms.viewMatrixInverse) * viewPosOrtho);
+    vec3 rayOrigin = worldPos;
+
+    float dither = BlueNoiseTemporal(blueNoiseTex, iPos, frameCounter);
+    float sunRise = 1.0 - clamp01(abs(SceneData.wLightVector.y) * 20.0);
+
+    float cloudShadowMap = RenderCloudShadowMap(cameraPosition, rayOrigin, rayDir, dither, 16);
+          cloudShadowMap = mix(cloudShadowMap, previousData[gl_LocalInvocationID.x][gl_LocalInvocationID.y], 0.95 * float(!SceneData.sceneChange));
+          cloudShadowMap = mix(cloudShadowMap, 1.0, sunRise);
+
+    imageStore(colorimg10, iPos, vec4(cloudShadowMap));
+}

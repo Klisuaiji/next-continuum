@@ -1,0 +1,38 @@
+layout (local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
+layout (r11f_g11f_b10f) uniform image3D integratedScatteringImg;
+layout (r11f_g11f_b10f) uniform image3D integratedTransmittanceImg;
+
+const ivec3 workGroups = ivec3(64, 32, 8);
+
+uniform sampler3D froxelScattering;
+uniform sampler3D froxelTransmittance;
+
+#include "../InternalLib/Syntax.glsl"
+#include "../InternalLib/Utilities.glsl"
+
+void main() {    
+    ivec3 iPos = ivec3(gl_GlobalInvocationID);
+
+    #ifndef VOLUMETRIC_LIGHT 
+        imageStore(integratedScatteringImg, iPos, vec4(0.0));
+        imageStore(integratedTransmittanceImg, iPos, vec4(1.0));
+        return;
+    #endif
+
+    vec3 totalTransmittance = vec3(1.0);
+    vec3 totalScattering = vec3(0.0);
+
+    for (int i = 0; i < iPos.z; i++) {
+        vec3 scattering = texelFetch(froxelScattering, ivec3(iPos.xy, i), 0).rgb;
+        vec3 stepOpticalDepth = texelFetch(froxelTransmittance, ivec3(iPos.xy, i), 0).rgb;
+        vec3 stepTransmittance       = exp(-stepOpticalDepth);
+        vec3 stepTransmittedFraction = clamp((1.0 - stepTransmittance) / stepOpticalDepth, 0.0, 1.0);
+        vec3 stepVisibleFraction     = totalTransmittance * stepTransmittedFraction;
+
+        totalScattering += scattering * stepVisibleFraction;
+        totalTransmittance *= stepTransmittance;
+    }
+
+    imageStore(integratedScatteringImg, iPos, vec4(totalScattering, 0.0));
+    imageStore(integratedTransmittanceImg, iPos, vec4(totalTransmittance, 0.0));
+}

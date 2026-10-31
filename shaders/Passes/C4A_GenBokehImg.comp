@@ -1,0 +1,50 @@
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+layout (rgba8) uniform image2D colorimg11;
+
+const ivec3 workGroups = ivec3(8, 8, 1);
+
+#include "../InternalLib/Syntax.glsl"
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Debug.glsl"
+
+vec3 LensBokeh(vec2 texcoord, vec2 offset) {
+	const float lod  = 2.0;
+	const float lod2 = exp2(lod);
+
+	const float a  = TAU / CAMERA_BLADES;
+	const mat2 rot = mat2(cos(a), -sin(a), sin(a), cos(a));
+
+	const float softness = 0.9;
+
+	const vec3 size  = 0.4 * vec3(1.0 - vec2(LENS_SHIFT_AMOUNT, 0.5 * LENS_SHIFT_AMOUNT), 1.0);
+	const vec3 size0 = size * softness;
+	const vec3 size1 = size0 * softness * 0.8;
+
+	float r = 0.0;
+	const vec2 caddv = vec2(sin(BLADE_ROTATION), -cos(BLADE_ROTATION));
+	vec2 addv = caddv;
+
+	vec2 coord = (texcoord - offset) * lod2;
+	vec2 centerOffset = coord - 0.5;
+
+	for(int i = 0; i < CAMERA_BLADES; ++i) {
+		addv = rot * addv;
+		r = max(r, dot(addv, centerOffset));
+	}
+
+	r = mix(r, length(centerOffset) * 0.8, BLADE_ROUNDING);
+
+	vec3 bokeh = clamp01(1.0 - smoothstep(size0, size, vec3(r)));
+	     bokeh = bokeh * (1.0 - clamp01(smoothstep(size, size1, vec3(r)) * CAMERA_BIAS));
+
+	return bokeh;
+}
+
+void main() {
+    ivec2 iPos = ivec2(gl_GlobalInvocationID.xy);
+    vec2 nCoord = (iPos + 0.5) / (workGroups.xy * gl_WorkGroupSize.xy);
+
+    vec3 bokeh = LensBokeh(nCoord, bokehOffset);
+
+    imageStore(colorimg11, iPos, vec4(bokeh, 0.0));
+}

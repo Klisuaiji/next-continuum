@@ -1,0 +1,79 @@
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+layout (r11f_g11f_b10f) uniform image2D colorimg9;
+
+const ivec3 workGroups = ivec3(1, 1, 1);
+
+#include "../InternalLib/Syntax.glsl"
+
+uniform sampler2D colortex9;
+
+uniform vec3 shadowLightPosition;
+uniform vec3 upPosition;
+uniform vec3 sunPosition;
+
+uniform float viewWidth, viewHeight;
+uniform float eyeAltitude;
+uniform float wetness;
+uniform float frameTimeCounter;
+
+uniform int worldTime;
+uniform int frameCounter;
+
+#include "../InternalLib/Utilities.glsl"
+#include "../InternalLib/Common/SpaceConversions.glsl"
+#include "../InternalLib/Fragment/Sky.fsh"
+
+vec4 ToSH(float value, vec3 dir) {
+    const float transferl1 = 0.3849 * PI;
+    const float sqrt1OverPI = sqrt(rPI);
+    const float sqrt3OverPI = sqrt(rPI * 3.0);
+
+    const vec2 halfnhalf = vec2(0.5, -0.5);
+    const vec2 transfer = vec2(PI * sqrt1OverPI, transferl1 * sqrt3OverPI);
+
+    const vec4 foo = halfnhalf.xyxy * transfer.xyyy;
+
+    return foo * vec4(1.0, dir.yzx) * value;
+}
+
+
+void CalculateSkySH(vec3 viewAbsorb) {
+	const int latSamples = 5;
+	const int lonSamples = 5;
+	const float rLatSamples = 1.0 / latSamples;
+	const float rLonSamples = 1.0 / lonSamples;
+	const float sampleCount = rLatSamples * rLonSamples;
+
+	const float latitudeSize = rLatSamples * PI;
+	const float longitudeSize = rLonSamples * TAU;
+
+	vec4 shR = vec4(0.0), shG = vec4(0.0), shB = vec4(0.0);
+	const float offset = 0.1;
+
+	for (int i = 0; i < latSamples; ++i) {
+		float latitude = float(i) * latitudeSize;
+
+		for (int j = 0; j < lonSamples; ++j) {
+			float longitude = float(j) * longitudeSize;
+
+			float c = cos(latitude);
+			vec3 kernel = vec3(c * cos(longitude), sin(latitude), c * sin(longitude));
+
+			vec3 worldVector = normalize(kernel + vec3(0.0, offset, 0.0));
+			vec2 nCoord = UnprojectSpherical(-worldVector);
+
+			vec3 skyCol = texture(colortex9, nCoord).rgb;
+
+			shR += ToSH(skyCol.r, kernel);
+			shG += ToSH(skyCol.g, kernel);
+			shB += ToSH(skyCol.b, kernel);
+		}
+	}
+
+	SceneData.skySH = mat3x4(shR, shG, shB) * sampleCount;
+}
+
+void main() {
+	CalculateSkySH(vec3(1.0));
+}
