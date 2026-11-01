@@ -23,7 +23,10 @@ uniform sampler2D dhDepthTex1;
 #define lod_depth_tex_solid dhDepthTex1
 #define lod_projection_matrix GenPerspectiveMat(fov, aspectRatio, dhNearPlane, dhFarPlane)
 #define lod_projection_matrix_inverse inverse(GenPerspectiveMat(fov, aspectRatio, dhNearPlane, dhFarPlane))
-#define lod_render_distance_blocks (dhRenderDistance * 16)
+// dhRenderDistance 由 Iris CommonUniforms 提供，取值 = DH chunkRenderDistance * 16，
+// 单位已经是「方块」（见 Iris compat/dh/DHCompatInternal.getDhBlockRenderDistance）。
+// 这里不能再乘 16，否则会比真实值大一个数量级。
+#define lod_render_distance_blocks dhRenderDistance
 
 #elif defined VOXY
 // ---------------- Voxy ----------------
@@ -40,6 +43,8 @@ uniform sampler2D vxDepthTexTrans;
 #define lod_projection_matrix vxProj
 #define lod_projection_matrix_inverse vxProjInv
 #define lod_previous_projection_matrix vxProjPrev
+// vxRenderDistance 单位是「chunk」（Voxy VoxyUniforms: sectionRenderDistance * 32），
+// 与 DH 的同名语义宏不同，需要乘 16 换算成方块。
 #define lod_render_distance_blocks (vxRenderDistance * 16)
 // Voxy 通道的合并矩阵维持现状：由 B0_InitSSBOs 重建后写入 CameraTransforms。
 

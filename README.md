@@ -2,13 +2,13 @@
 
 **An experimental compatibility and porting project for Continuum 2.0 Redux.**
 
-Next Continuum explores the adaptation of **Continuum 2.0 Redux Build 2** to modern Minecraft environments, with a particular focus on Iris and Minecraft 1.21.1.
+Next Continuum explores the adaptation of **Continuum 2.0 Redux Build 2** to modern Minecraft environments, with a particular focus on Iris and the three maintained Minecraft lines: **1.21.1, 1.21.11 and 26.2**.
 
 The project aims to investigate rendering compatibility, shader behavior, performance, and integration challenges while developing an independent migration and compatibility workflow.
 
 ## Project Goals
 
-- Investigate Continuum Redux compatibility with Minecraft 1.21.1.
+- Investigate Continuum Redux compatibility with Minecraft 1.21.1 / 1.21.11 / 26.2.
 - Explore Iris shader pipeline compatibility.
 - Study rendering differences between shader platform versions.
 - Identify and document migration issues.
@@ -19,11 +19,14 @@ The project aims to investigate rendering compatibility, shader behavior, perfor
 
 | Component | Target |
 |---|---|
-| Minecraft | 1.21.1 |
-| Mod Loader | NeoForge |
-| Shader Loader | Iris |
+| Minecraft (maintained) | 1.21.1 · 1.21.11 · 26.2 |
+| Mod Loader | Fabric / NeoForge |
+| Shader Loader | Iris (1.8.x on 1.21.1 · 1.10.x on 1.21.11 · 1.11.x on 26.2) |
+| LOD | Distant Horizons 3.3.3 (all three) · Voxy (1.21.11 / 26.2 native Fabric, 1.21.1 via Roxy) |
 | Upstream Project | Continuum 2.0 Redux Build 2 |
 | Shader Language | GLSL |
+
+Per-version Iris / Distant Horizons / Voxy / Roxy builds and the verified integration surface are tracked in [`docs/TARGET-MATRIX.md`](docs/TARGET-MATRIX.md).
 
 ## Project Status
 
@@ -33,9 +36,9 @@ This is an ongoing technical research and porting project. Compatibility, perfor
 
 ### Phase 2 (since 2026-10): LOD Support
 
-- Scope: **Iris only, Minecraft 1.21.1+**. The OptiFine ("高清修复") compatibility line and the 1.21.1 down-port are archived as tag `legacy-1.21.1`.
-- Adding **Distant Horizon LOD support** (`dh_terrain` / `dh_water` programs + LodSupport abstraction layer).
-- **Voxy integration kept as first-class** (`voxy.json` schema v1 verified against current upstream; `shadow_voxels` and `renderScale` planned), maintained together with **Roxy** (NeoForge translation layer) — see `docs/TARGET-MATRIX.md`.
+- Scope: **Iris only, on the three maintained lines — Minecraft 1.21.1 / 1.21.11 / 26.2**. The OptiFine ("高清修复") compatibility line and the 1.21.1 down-port are archived as tag `legacy-1.21.1`.
+- Adding **Distant Horizon LOD support** (`dh_terrain` / `dh_water` / `dh_shadow` programs + LodSupport abstraction layer; uniform and sampler names re-verified against the Iris `1.21.1`, `1.21.11` and `26.2` branches).
+- **Voxy integration kept as first-class** (`voxy.json` schema v1, verified against Voxy `0.2.16-beta` for 1.21.11 and `0.2.19-beta` for 26.2 — both inject `#define VOXY 2`; `shadow_voxels` and `renderScale` still planned), maintained together with **Roxy** (MIT NeoForge translation layer, the only Voxy path on 1.21.1) — see `docs/TARGET-MATRIX.md`.
 - Localization: `zh_CN` / `zh_TW` / `ja_JP` language files for the Iris settings UI (full key coverage of `en_US.lang`);
 - Static checks (include graph / resource budget / GLSL baseline diff) run in CI; all deviations from upstream are tracked in `docs/UPSTREAM-DIFF.md`.
 

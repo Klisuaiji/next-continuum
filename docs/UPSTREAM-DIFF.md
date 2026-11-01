@@ -128,6 +128,30 @@ LOD 阴影调研结论（2026-10-31，Iris 1.21.11 + Voxy dev 源码核验）：
 
 V2 深度验证结论：修复后在真实 C2 融合上下文（V2 开）中，V2 主函数（融合文件 2331→2398 行）在 include 链既有的上游 texture2D 阻断点之前被完整、干净地解析；V2 关/开在相同补全下错误集合完全一致，V2 未引入任何新错误。
 
+### S10 维护范围收敛到三条版本线 + LOD 接口语义修正（本次提交）
+
+背景：维护范围正式收敛为 **MC 1.21.1 / 1.21.11 / 26.2** 三条线（1.21.10 及 26.x「只跟踪不出包」的旧表述作废）。本轮对三条线逐一核验了 Iris / Distant Horizons / Voxy / Roxy 的构建与接口，核验证据与结论落在 `docs/TARGET-MATRIX.md`。
+
+| 文件 | 类型 | 说明 | rebase 难度 |
+|---|---|---|---|
+| `docs/TARGET-MATRIX.md` | 修改 | 重写支持分级为三条维护线（含各线 Iris/DH/Voxy/Roxy 具体构建号与发布日期）；新增「接口核验」小节，逐条记录 DH 程序名与 uniform/采样器来源、Voxy 集成入口在 Voxy 侧而非 Iris 侧、`voxy.json` schema 键位、Roxy 依赖组合；红线与上游跟踪清单同步更新 | 无（纯文档） |
+| `README.md` | 修改 | Target Environment 表改为三条维护线 + LOD 行，指向 TARGET-MATRIX；Phase 2 scope 与 DH/Voxy 描述同步 | 无（纯文档） |
+| `pack.mcmeta` | 修改 | description 改为 `Iris | MC 1.21.1 / 1.21.11 / 26.2 | DH + Voxy LOD`；`pack_format` 保持 34（= 1.21.1 下限，未改） | 无 |
+| `shaders/InternalLib/Common/LodSupport.glsl` | 修改 | **单位修正**：DH 分支 `lod_render_distance_blocks` 由 `(dhRenderDistance * 16)` 改为 `dhRenderDistance`。Iris `CommonUniforms` 提供的 `dhRenderDistance` 来自 `DHCompatInternal.getDhBlockRenderDistance()`（= `chunkRenderDistance * 16`），单位已是方块，旧写法会放大 16 倍；Voxy 分支 `vxRenderDistance` 单位确为 chunk（`VoxyUniforms`: `sectionRenderDistance * 32`），保留 `* 16`。两侧各加注释说明单位来源 | 低（宏未被消费，无渲染行为变化） |
+
+本轮核验修正的既有错误结论（原文见 git 历史）：
+
+- `SHADER_DEFINE_VERSION` 原记为「现为 3」→ 实测 **1.21.11（Voxy 分支 `12111`，0.2.16-beta）与 26.2（分支 `2622`，0.2.19-beta）均为 2**；3 只存在于 `263` / `dev`（0.2.20-beta，MC 26.3）。
+- 「Voxy 0.2.16-beta 官方 NeoForge 支持核验中」→ 实测 Voxy 全部构建 `loaders` 仅 `fabric`，NeoForge 侧唯一路径是 Roxy；且 Voxy **没有 1.21.1 构建**（Modrinth 查询 0 命中）。
+- 「DH 2.x，Iris≥1.7.5」等 DH 2.x 时代的版本门槛 → DH 当前为 3.3.3，三线均有构建；改为记录 DH 3.3.3 对 MC 26.1.2+ 的 Iris lightmap/blend 修复。
+- 「Voxy 本体要求 OpenGL 4.6」→ 未在 Voxy 源码中核到该断言，已删除，改记 `Capabilities.java` 中可核实的 GL 4.4 常量与扩展要求。
+
+新增待办（本轮只登记，不改代码）：
+
+- Iris `26.2` 分支的 DH 程序新增 `dhBlockAtlas`（并把 DH block ratio atlas 绑到纹理单元 0）。本包 DH 程序目前不采样方块图集，无影响；若后续给 DH 地形加图集着色，26.2 必须走 `dhBlockAtlas`。
+- Voxy `263` / `dev` 的 revZ 深度反转重写与 `vxNearPlane` / `vxFarPlane` / `useDynamicFarPlane`：等 26.2 线出现 `SHADER_DEFINE_VERSION = 3` 的构建时，重查 `voxy_opaque.glsl` / `voxy_translucent.glsl` 的 `gl_FragDepth` / `gl_FragCoord` / 深度采样写法。
+- `lod_render_distance_blocks` 目前在包内**无消费点**（仅 `lod_depth_tex*` 与 `lod_projection_matrix_inverse` 被 C0/D0 使用）；单位修正属于消除潜在债，不改变现有渲染结果。
+
 ### 计划改动（实施时逐条登记）
 
 - S1：`InternalLib/Common/LodSupport.glsl`（新增）；`Passes/B0_InitSSBOs.comp`、`Passes/C0|D0_ConstructDepth.comp`、`Passes/C8_TAA.frag`（修改）
