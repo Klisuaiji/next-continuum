@@ -20,7 +20,6 @@ uniform float wetness;
 uniform float frameTimeCounter;
 
 uniform int frameCounter;
-uniform int vxRenderDistance;
 uniform int worldTime;
 
 uniform bool worldTimeChange;
@@ -31,6 +30,7 @@ uniform bool worldTimeChange;
 #include "../InternalLib/Utilities.glsl"
 #include "../InternalLib/Uniform/Matrices.glsl"
 #include "../InternalLib/Debug.glsl"
+#include "../InternalLib/Common/LodSupport.glsl"
 #include "../InternalLib/Fragment/Sky.fsh"
 
 void WriteCameraTransforms() {
@@ -43,7 +43,15 @@ void WriteCameraTransforms() {
     CameraTransforms.viewMatrix = gbufferModelView;
     CameraTransforms.viewMatrixInverse = gbufferModelViewInverse;
 
-    #if defined VOXY
+    #if defined DISTANT_HORIZONS
+        // DH 通道：直接使用 Iris 提供的合并矩阵，不做透视重建（避免剪切分量丢失）
+        CameraTransforms.nearPlane = combined_near;
+        CameraTransforms.farPlane = combined_far;
+
+        CameraTransforms.projectionMatrix = combined_projection_matrix;
+        CameraTransforms.projectionMatrixInverse = combined_projection_matrix_inverse;
+    #elif defined VOXY
+        // Voxy 通道：维持现状透视重建（已知债，docs/UPSTREAM-DIFF.md）
         CameraTransforms.nearPlane = near;
         CameraTransforms.farPlane = vxRenderDistance * 16.0;
 

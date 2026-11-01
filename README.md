@@ -31,6 +31,14 @@ The project aims to investigate rendering compatibility, shader behavior, perfor
 
 This is an ongoing technical research and porting project. Compatibility, performance, and feature support are still being investigated.
 
+### Phase 2 (since 2026-10): LOD Support
+
+- Scope: **Iris only, Minecraft 1.21.1+**. The OptiFine ("高清修复") compatibility line and the 1.21.1 down-port are archived as tag `legacy-1.21.1`.
+- Adding **Distant Horizon LOD support** (`dh_terrain` / `dh_water` programs + LodSupport abstraction layer).
+- **Voxy integration kept as first-class** (`voxy.json` schema v1 verified against current upstream; `shadow_voxels` and `renderScale` planned), maintained together with **Roxy** (NeoForge translation layer) — see `docs/TARGET-MATRIX.md`.
+- Localization: `zh_CN` / `zh_TW` / `ja_JP` language files for the Iris settings UI (full key coverage of `en_US.lang`);
+- Static checks (include graph / resource budget / GLSL baseline diff) run in CI; all deviations from upstream are tracked in `docs/UPSTREAM-DIFF.md`.
+
 ## Upstream Project
 
 Next Continuum is based on research into the publicly released Continuum 2.0 Redux project.

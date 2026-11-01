@@ -1,0 +1,446 @@
+# Copyright (C) Continuum Graphics - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Joseph Conover <support@continuum.graphics>, Febuary 2018
+
+# shaders/lang/zh_CN.lang（Next Continuum 简体中文，术语表驱动机辅翻译，请配合上游更新校对）
+
+# Profiles
+profile.MINIMUM=最低
+profile.LOW=低
+profile.MEDIUM=中
+profile.HIGH=高
+profile.ULTRA=超高
+profile.CINEMATIC=电影级
+profile.comment=电影级档位是个纯粹的"梗"，只为开心时使用！
+
+#Screens
+screen.CAMERA=相机设置
+screen.CAMERA.comment=相机、景深与色调映射选项。
+screen.LENS=镜头设置
+screen.LENS.comment=景深与镜头光晕设置，可配置光斑形状。
+screen.TONING=后处理设置
+screen.TONING.comment=与后处理相关的选项。
+screen.FILMIC=胶片色调曲线
+screen.FILMIC.comment=Filmic 色调映射算子的选项。
+screen.TAAOPTIONS=TAA 选项
+screen.TAAOPTIONS.comment=时域抗锯齿（TAA）选项。
+screen.SURFACE=表面设置
+screen.SURFACE.comment=光照质量与材质设置。警告：会显著影响性能！
+screen.PARALLAX=视差设置
+screen.PARALLAX.comment=视差设置
+screen.MATERIAL=材质设置
+screen.MATERIAL.comment=材质设置。
+screen.SHADOW=阴影设置
+screen.SHADOW.comment=阴影设置
+screen.AMBIENT=环境光设置
+screen.AMBIENT.comment=AO（环境光遮蔽）设置
+screen.SPECULAR=高光设置
+screen.SPECULAR.comment=高光/反射设置
+screen.GI=全局光照设置
+screen.GI.comment=全局光照（GI）设置
+screen.ATMOSPHERICS=大气设置
+screen.ATMOSPHERICS.comment=与大气相关的设置
+screen.CLOUDS=云设置
+screen.CLOUDS.comment=2D 与体积云设置
+screen.VCLOUDS=体积云设置
+screen.VCLOUDS.comment=体积云设置
+screen.PCLOUDS=2D 云设置
+screen.PCLOUDS.comment=2D 云设置
+screen.VLIGHT=雾设置
+screen.VLIGHT.comment=体积光
+screen.INTERNAL=内部设置
+screen.INTERNAL.comment=开发选项！
+screen.MISC=杂项设置
+screen.MISC.comment=未分组设置
+screen.LIGHTING=光照设置
+screen.LIGHTING.comment=通用光照设置
+screen.WATER_SETTINGS=水面设置
+screen.VLIGHT_OVERWORLD=主世界雾设置
+screen.VLIGHT_NETHER=下界雾设置
+screen.VLIGHT_END=末地雾设置
+
+# Camera Settings
+value.CAMERA_MODE.CAMERA_AUTO=自动
+value.CAMERA_MODE.CAMERA_MANUAL=手动
+
+option.INFO=Continuum 2.0 Redux
+value.INFO.0=作者：uvraj
+value.INFO.1=作者：uvraj
+
+option.CAMERA_MODE=相机模式
+option.CAMERA_MODE.comment=相机工作模式。"自动"最适合游戏（相机自行调节）；"手动"适合截图与视频（需要精确控制时）。
+option.CAMERA_APERTURE=光圈
+option.CAMERA_APERTURE.comment=光圈大小，单位 f 值。
+option.CAMERA_ISO=感光度（ISO）
+option.CAMERA_ISO.comment=传感器对光的敏感度。
+option.CAMERA_SHUTTER_SPEED=快门速度
+option.CAMERA_SHUTTER_SPEED.comment=每帧曝光时间。
+option.CAMERA_EV=EV 曝光补偿
+option.CAMERA_EV.comment=曝光调整。
+option.CAMERA_FOCAL_LENGTH=焦距
+option.CAMERA_FOCAL_LENGTH.comment=主焦点距离（毫米）。手动模式下影响镜头光晕与景深。
+suffix.CAMERA_FOCAL_LENGTH=mm
+
+value.CAMERA_FOCUS_MODE.1=手动
+value.CAMERA_FOCUS_MODE.0=自动
+
+option.CAMERA_FOCUS_MODE=对焦模式
+option.CAMERA_FOCUS_MODE.comment="自动"对玩家注视处对焦；"手动"可设定对焦距离（米）。
+option.CAMERA_FOCAL_POINT=对焦点距离
+option.CAMERA_FOCAL_POINT.comment=手动对焦模式下相机对焦的距离。
+suffix.CAMERA_FOCAL_POINT=m
+
+# DoF Settings
+value.DOF_SAMPLES.DOF_MINIMUM=最低
+value.DOF_SAMPLES.DOF_LOW=低
+value.DOF_SAMPLES.DOF_MEDIUM=中
+value.DOF_SAMPLES.DOF_HIGH=高
+value.DOF_SAMPLES.DOF_ULTRA=超高
+value.DOF_SAMPLES.DOF_CINEMATIC=电影级
+
+option.DOF=景深
+option.DOF.comment=相机对焦。
+option.DOF_SAMPLES=景深质量
+option.DOF_SAMPLES.comment=模糊质量：低 32 / 中 64 / 高 128 / 超高 256 / 电影级 1024。
+
+option.CAMERA_BLADES=光圈叶片数
+option.CAMERA_BLADES.comment=光圈多边形边数：3=三角，4=方形，5=五边，6=六边，以此类推。
+option.BLADE_ROTATION=叶片旋转
+option.BLADE_ROTATION.comment=旋转光斑。
+option.BLADE_ROUNDING=叶片圆度
+option.BLADE_ROUNDING.comment=光圈形状边缘圆滑程度：0=无圆度，1=完全圆形。
+option.CAMERA_BIAS=相机偏置
+option.CAMERA_BIAS.comment=镜片吸收程度：0.0=完全吸收，1.0=完全透过。
+option.LENS_SHIFT_AMOUNT=镜头位移量
+option.DISTORTION_ANAMORPHIC=宽幅变形畸变
+
+# Lens Settings
+value.BLOOM_SAMPLES.BLOOM_LOW=低
+value.BLOOM_SAMPLES.BLOOM_MEDIUM=中
+value.BLOOM_SAMPLES.BLOOM_HIGH=高
+value.BLOOM_SAMPLES.BLOOM_ULTRA=超高
+
+option.LENS_FLARE=镜头光晕
+option.LENS_FLARE_STRENGTH=镜头光晕强度
+
+option.VIGNETTE=暗角
+option.VIGNETTE_FALLOFF=暗角衰减
+
+option.BLOOM=辉光
+option.BLOOM_SAMPLES=辉光质量
+option.BLOOM_EV=辉光 EV
+option.BLOOM_EV.comment=辉光 EV 偏移，调整辉光亮度。
+option.BLOOM_CURVE=辉光曲线
+
+# Post Process Settings
+option.TONING_FILMIC=Filmic 色调映射
+option.SAT_MOD=饱和度
+option.SAT_MOD.comment=饱和度修正。
+option.VIB_MOD=自然饱和度
+option.VIB_MOD.comment=鲜艳度修正。
+option.CONT_MOD=对比度
+option.CONT_MOD.comment=对比度修正。
+option.CONT_MIDPOINT=对比中点
+option.GAMMA_CORRECTION=伽马
+option.GAIN_MOD=增益
+option.GAIN_MOD.comment=直接亮度。
+option.LIFT_MOD=黑场提升
+option.LIFT_MOD.comment=移动黑点。
+option.LUT=L.U.T.
+option.WHITE_BALANCE=白平衡
+option.TINT_BALANCE=色调
+
+option.ACES_TOE=趾部 (Toe)
+option.ACES_SLOPE=斜率 (Slope)
+option.ACES_SHOULDER=肩部 (Shoulder)
+option.ACES_BLACK_CLIP=黑场裁切
+option.ACES_WHITE_CLIP=白场裁切
+option.ACES_GLOW_GAIN=辉光修正
+option.ACES_GLOW_MID=辉光中点
+option.ACES_EXPAND_GAMUT=色域扩展
+
+# TAA options
+option.TAA_AGGRESSION=TAA 强度
+option.TAA_SHARPNESS=TAA 锐度
+option.TAA_SHARPEN=TAA 锐化
+
+# Light Settings
+option.sky_sunLuminanceBase=太阳亮度
+option.sky_sunColorTemperature=太阳色温
+option.sky_moonLuminanceBase=月亮亮度
+option.sky_moonColorTemperature=月亮色温
+option.TORCH_LUMINANCE=火把亮度
+option.TORCH_TEMPERATURE=火把色温
+option.COLORED_LIGHTING=彩色光照
+option.EMITTER_MASKS=自发光掩模
+option.HANDHELD_LIGHTS=手持光源
+
+suffix.sky_sunColorTemperature=K
+suffix.sky_moonColorTemperature=K
+suffix.TORCH_TEMPERATURE=K
+
+suffix.sky_sunLuminanceBase=lx
+suffix.sky_moonLuminanceBase=lx
+suffix.TORCH_LUMINANCE=lx
+
+# Shadow Settings
+value.SHADOW_QUALITY.SHADOW_MINIMUM=最低
+value.SHADOW_QUALITY.SHADOW_LOW=低
+value.SHADOW_QUALITY.SHADOW_MEDIUM=中
+value.SHADOW_QUALITY.SHADOW_HIGH=高
+value.SHADOW_QUALITY.SHADOW_ULTRA=超高
+value.SHADOW_QUALITY.SHADOW_CINEMATIC=电影级
+
+option.SHADOW_QUALITY=阴影质量
+option.SHADOW_QUALITY.comment=阴影模糊质量：最低 2 / 低 3 / 中 9 / 高 18 / 超高 25 / 电影级 81。
+option.SHADOW_PENUMBRA_ANGLE=半影角
+option.shadowMapResolution=阴影贴图分辨率
+option.shadowDistance=阴影距离
+option.SHADOW_DISTORTION_FACTOR=畸变系数
+
+option.CONTACT_SHADOWS_ENABLED=接触阴影
+option.DISTANT_SHADOWS_ENABLED=远景阴影
+
+value.SHADOW_TYPE.SHADOW_HARD=硬阴影
+value.SHADOW_TYPE.SHADOW_SOFT=软阴影
+value.SHADOW_TYPE.SHADOW_PCSS=双重 PCSS
+
+option.SHADOW_TYPE=阴影类型
+
+option.CAUSTICS=水底焦散
+
+# Ambient Settings
+value.AMBIENT_SAMPLES.AMBIENT_MINIMUM=最低
+value.AMBIENT_SAMPLES.AMBIENT_LOW=低
+value.AMBIENT_SAMPLES.AMBIENT_MEDIUM=中
+value.AMBIENT_SAMPLES.AMBIENT_HIGH=高
+value.AMBIENT_SAMPLES.AMBIENT_ULTRA=超高
+value.AMBIENT_SAMPLES.AMBIENT_CINEMATIC=电影级
+
+option.AMBIENT_SAMPLES=环境光质量
+option.AMBIENT_SAMPLES.comment=AO 质量。
+
+option.AMBIENT_LUM_OVERWORLD=主世界伪环境光强度
+option.AMBIENT_LUM_NETHER=下界伪环境光强度
+option.AMBIENT_LUM_END=末地伪环境光强度
+option.NIGHT_VISION_STRENGTH=夜视强度
+
+option.AO_CHEAP=简易 AO
+option.AO_CHEAP.comment=关闭远场 AO。
+
+# Specular Settings
+option.SPECULAR_CLAMP=高光钳制
+option.SPECULAR_TAIL_CLAMP=高光钳制偏置
+value.SPECULAR_QUALITY.SPECULAR_MINIMUM=最低
+value.SPECULAR_QUALITY.SPECULAR_LOW=低
+value.SPECULAR_QUALITY.SPECULAR_MEDIUM=中
+value.SPECULAR_QUALITY.SPECULAR_HIGH=高
+value.SPECULAR_QUALITY.SPECULAR_ULTRA=超高
+value.SPECULAR_QUALITY.SPECULAR_CINEMATIC=电影级
+
+option.SPECULAR_QUALITY=高光质量
+option.SPECULAR_QUALITY.comment=每像素高光光线数。
+
+option.RAIN_PUDDLES=雨水积水
+
+option.REFLECT_2D_CLOUDS=反射 2D 云
+option.REFLECT_3D_CLOUDS=反射 3D 云
+option.REFLECTED_CLOUDS_QUALITY=云反射质量
+option.REFLECTED_CLOUDS_QUALITY_DIRECT=云反射直接光质量
+
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_MINIMUM=最低
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_LOW=低
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_MEDIUM=中
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_HIGH=高
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_ULTRA=超高
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_CINEMATIC=电影级
+
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_MINIMUM=最低
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_LOW=低
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_MEDIUM=中
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_HIGH=高
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_ULTRA=超高
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_CINEMATIC=电影级
+
+value.RAYTRACE_QUALITY.RAYTRACE_MINIMUM=最低
+value.RAYTRACE_QUALITY.RAYTRACE_LOW=低
+value.RAYTRACE_QUALITY.RAYTRACE_MEDIUM=中
+value.RAYTRACE_QUALITY.RAYTRACE_HIGH=高
+value.RAYTRACE_QUALITY.RAYTRACE_ULTRA=超高
+value.RAYTRACE_QUALITY.RAYTRACE_CINEMATIC=电影级
+
+option.RAYTRACE_QUALITY=光线追踪质量
+option.RAYTRACE_QUALITY.comment=每条光线的步数。
+
+value.RAYTRACE_REFINES.REFINES_MINIMUM=最低
+value.RAYTRACE_REFINES.REFINES_LOW=低
+value.RAYTRACE_REFINES.REFINES_MEDIUM=中
+value.RAYTRACE_REFINES.REFINES_HIGH=高
+value.RAYTRACE_REFINES.REFINES_ULTRA=超高
+value.RAYTRACE_REFINES.REFINES_CINEMATIC=电影级
+
+option.RAYTRACE_REFINES=光线追踪精度
+option.RAYTRACE_REFINES.comment=每条光线的精炼次数。
+
+# Parallax Settings
+option.TERRAIN_PARALLAX=地形视差
+option.WATER_PARALLAX=水面视差
+
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_MINIMUM=最低
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_LOW=低
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_MEDIUM=中
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_HIGH=高
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_ULTRA=超高
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_CINEMATIC=电影级
+
+option.TERRAIN_PARALLAX_SAMPLES=地形视差质量
+option.TERRAIN_PARALLAX_SAMPLES.comment=最大步数。
+
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_MINIMUM=最低
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_LOW=低
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_MEDIUM=中
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_HIGH=高
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_ULTRA=超高
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_CINEMATIC=电影级
+
+option.WATER_PARALLAX_SAMPLES=水面视差质量
+
+option.TERRAIN_PARALLAX_DEPTH=视差深度
+option.WATER_PARALLAX_DEPTH=水面视差深度
+
+# Material Settings
+value.SPECULAR_MODE.SPECULAR_OLD=旧 PBR
+value.SPECULAR_MODE.SPECULAR_NEW=Continuum PBR
+value.SPECULAR_MODE.SPECULAR_LAB=shaderLABs PBR
+
+option.SPECULAR_MODE=高光贴图格式
+option.SPECULAR_MODE.comment=新贴图（shaderLABs PBR 格式）选 'Lab PBR'；旧格式贴图选 '旧 PBR'；Continuum 旧 PBR 格式贴图选 'Continuum PBR'。
+
+option.REFRACTION=折射
+
+# Water Settings 
+option.WATER_SPEED_MULT=水流速度
+option.WAVE_HEIGHT_MULT=波浪高度
+option.HORIZON_WAVE_FADE=地平波浪淡出
+option.HORIZON_WAVE_FADE_FALLOFF=波浪淡出衰减
+
+# Atmospheric Settings
+option.CLOUDS_2D=2D 云
+option.CLOUDS_2D_DENSITY=2D 云密度
+option.CLOUDS_2D_COVERAGE=2D 云覆盖率
+
+option.VOLUMETRIC_CLOUDS=体积云
+
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_MINIMUM=最低
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_LOW=低
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_MEDIUM=中
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_HIGH=高
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_ULTRA=超高
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_CINEMATIC=电影级
+
+option.VOLUMETRIC_CLOUDS_QUALITY=体积云质量
+
+option.VOLUMETRIC_CLOUDS_ALTITUDE=云高度
+option.VOLUMETRIC_CLOUDS_SPEED=云速
+option.VOLUMETRIC_CLOUDS_DENSITY=云密度
+option.VOLUMETRIC_CLOUDS_COVERAGE=云覆盖率
+option.VOLUMETRIC_CLOUDS_HEIGHT=云厚度
+option.VOLUMETRIC_CLOUDS_SCALE=云缩放
+
+option.VOLUMETRIC_CLOUDS_SHADOWS=云影
+
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_MINIMUM=最低
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_LOW=低
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_MEDIUM=中
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_HIGH=高
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_ULTRA=超高
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_CINEMATIC=电影级
+
+option.VOLUMETRIC_CLOUDS_DIRECT_QUALITY=云阳光质量
+
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_MINIMUM=最低
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_LOW=低
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_MEDIUM=中
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_HIGH=高
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_ULTRA=超高
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_CINEMATIC=电影级
+
+option.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY=云天光质量
+
+option.VOLUMETRIC_LIGHT=体积光
+
+option.WATER_VOLUMETRIC_LIGHT=水下体积光
+option.WATER_VL_QUALITY=水下体积光质量
+
+value.VL_QUALITY.VL_MINIMUM=最低
+value.VL_QUALITY.VL_LOW=低
+value.VL_QUALITY.VL_MEDIUM=中
+value.VL_QUALITY.VL_HIGH=高
+value.VL_QUALITY.VL_ULTRA=超高
+value.VL_QUALITY.VL_CINEMATIC=电影级
+
+value.WATER_VL_QUALITY.WATER_VL_MINIMUM=最低
+value.WATER_VL_QUALITY.WATER_VL_LOW=低
+value.WATER_VL_QUALITY.WATER_VL_MEDIUM=中
+value.WATER_VL_QUALITY.WATER_VL_HIGH=高
+value.WATER_VL_QUALITY.WATER_VL_ULTRA=超高
+value.WATER_VL_QUALITY.WATER_VL_CINEMATIC=电影级
+
+option.VL_QUALITY=体积光质量
+
+option.AERIAL_VL=大气体积光
+
+option.VL_COLOURED_SHADOW=彩色阴影
+
+option.VL_CLOUD_SHADOW=云影
+option.VL_SELF_SHADOW=自阴影
+
+option.FOG_DENSITY_RAYLEIGH=环境瑞利散射密度
+option.FOG_DENSITY_MIE_AMBIENT=环境米氏散射密度
+option.RAIN_CLOUD_DENSITY=雨云密度
+option.FOG_MORNING_DENSITY=晨雾密度
+option.FOG_DENSITY_AMBIENT_BASE_HEIGHT=环境雾高度
+option.FOG_MORNING_BASE_HEIGHT=晨雾高度
+option.FOG_DENSITY_AMBIENT_FALLOFF=环境雾衰减
+option.FOG_MORNING_FALLOFF=晨雾衰减
+option.DISTANCE_FADE=距离淡出
+option.LPV_FOG_STRENGTH_OVERWORLD=主世界 LPV 雾强度
+option.LPV_FOG_STRENGTH_NETHER=下界 LPV 雾强度
+option.LPV_FOG_STRENGTH_END=末地 LPV 雾强度
+
+option.END_FOG_DENSITY_GLOBAL=末地全局雾密度
+option.END_FOG_DENSITY_MIE=末地米氏密度
+option.END_FOG_DENSITY_RAYLEIGH=末地瑞利密度
+option.END_FOG_FALLOFF=末地雾衰减
+
+option.NETHER_FOG_DENSITY_GLOBAL=下界全局雾密度
+option.NETHER_FOG_DENSITY_MIE=下界米氏密度
+option.NETHER_FOG_DENSITY_RAYLEIGH=下界瑞利密度
+
+#global illumination Settings
+option.GLOBAL_ILLUMINATION=全局光照
+option.GI_RADIUS=GI 半径
+option.GI_QUALITY=GI 质量
+
+value.GI_QUALITY.GI_MINIMUM=最低
+value.GI_QUALITY.GI_LOW=低
+value.GI_QUALITY.GI_MEDIUM=中
+value.GI_QUALITY.GI_HIGH=高
+value.GI_QUALITY.GI_ULTRA=超高
+value.GI_QUALITY.GI_CINEMATIC=电影级
+
+option.TIME_SPEED=时间流速倍率
+option.WHITE_WORLD=白盒世界（全白测试）
+
+# Debug settings
+option.DEBUG=调试
+option.DEBUG_VIEW=调试视图
+value.DEBUG_VIEW.-1=gbuffers_solid
+value.DEBUG_VIEW.0=deferred
+value.DEBUG_VIEW.9=gbuffers_translucent
+value.DEBUG_VIEW.10=composite
+value.DEBUG_VIEW.11=composite1
+value.DEBUG_VIEW.12=composite2
+value.DEBUG_VIEW.13=composite3
+value.DEBUG_VIEW.20=final

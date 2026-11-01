@@ -1,0 +1,446 @@
+# Copyright (C) Continuum Graphics - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Joseph Conover <support@continuum.graphics>, Febuary 2018
+
+# shaders/lang/ja_JP.lang（日本語、Next Continuum 機械補助翻訳）
+
+# Profiles
+profile.MINIMUM=最低
+profile.LOW=低
+profile.MEDIUM=中
+profile.HIGH=高
+profile.ULTRA=ウルトラ
+profile.CINEMATIC=シネマティック
+profile.comment=シネマティックは完全なジョークです。楽しむためだけにどうぞ！
+
+#Screens
+screen.CAMERA=カメラ設定
+screen.CAMERA.comment=カメラ、被写界深度、トーンマップのオプション。
+screen.LENS=レンズ設定
+screen.LENS.comment=ボケ形状を設定できます。
+screen.TONING=ポストプロセス設定
+screen.TONING.comment=ポストプロセス関連のオプション。
+screen.FILMIC=フィルムック補正
+screen.FILMIC.comment=フィルムトーンマッピング演算子のオプション。
+screen.TAAOPTIONS=TAA オプション
+screen.TAAOPTIONS.comment=時間的アンチエイリアシングのオプション。
+screen.SURFACE=サーフェス設定
+screen.SURFACE.comment=照明品質とマテリアル設定。性能に大きく影響します！
+screen.PARALLAX=パララックス設定
+screen.PARALLAX.comment=パララックス設定
+screen.MATERIAL=マテリアル設定
+screen.MATERIAL.comment=マテリアル設定。
+screen.SHADOW=シャドウ設定
+screen.SHADOW.comment=シャドウ設定
+screen.AMBIENT=アンビエント設定
+screen.AMBIENT.comment=AO の設定
+screen.SPECULAR=鏡面反射設定
+screen.SPECULAR.comment=ハイライト/反射の設定
+screen.GI=グローバルイルミネーション設定
+screen.GI.comment=GI の設定
+screen.ATMOSPHERICS=大気設定
+screen.ATMOSPHERICS.comment=大気に関する設定
+screen.CLOUDS=雲設定
+screen.CLOUDS.comment=2D および体積雲の設定
+screen.VCLOUDS=体積雲設定
+screen.VCLOUDS.comment=体積雲の設定
+screen.PCLOUDS=2D 雲設定
+screen.PCLOUDS.comment=2D 雲の設定
+screen.VLIGHT=フォグ設定
+screen.VLIGHT.comment=ボルメトリックライト
+screen.INTERNAL=内部設定
+screen.INTERNAL.comment=開発用オプション！
+screen.MISC=その他設定
+screen.MISC.comment=未分類の設定
+screen.LIGHTING=ライティング設定
+screen.LIGHTING.comment=汎用照明の設定
+screen.WATER_SETTINGS=水面設定
+screen.VLIGHT_OVERWORLD=オーバーワールド霧設定
+screen.VLIGHT_NETHER=ネザー霧設定
+screen.VLIGHT_END=エンド霧設定
+
+# Camera Settings
+value.CAMERA_MODE.CAMERA_AUTO=自動
+value.CAMERA_MODE.CAMERA_MANUAL=手動
+
+option.INFO=Continuum 2.0 Redux
+value.INFO.0=by uvraj
+value.INFO.1=by uvraj
+
+option.CAMERA_MODE=カメラモード
+option.CAMERA_MODE.comment=自動はゲーム向けにカメラが自動調整します。手動はスクリーンショットや映像向けです。
+option.CAMERA_APERTURE=絞り
+option.CAMERA_APERTURE.comment=絞りの大きさ（f値）。
+option.CAMERA_ISO=ISO感度
+option.CAMERA_ISO.comment=光への感度。
+option.CAMERA_SHUTTER_SPEED=シャッター速度
+option.CAMERA_SHUTTER_SPEED.comment=各フレームの露光時間。
+option.CAMERA_EV=EVオフセット
+option.CAMERA_EV.comment=露出の調整。
+option.CAMERA_FOCAL_LENGTH=焦点距離
+option.CAMERA_FOCAL_LENGTH.comment=主焦点距離（ミリ）。手動モードでレンズフレアと被写界深度に影響します。
+suffix.CAMERA_FOCAL_LENGTH=mm
+
+value.CAMERA_FOCUS_MODE.1=手動
+value.CAMERA_FOCUS_MODE.0=自動
+
+option.CAMERA_FOCUS_MODE=ピントモード
+option.CAMERA_FOCUS_MODE.comment=自動はプレイヤーの注視点にピントを合わせます。手動は距離を設定できます。
+option.CAMERA_FOCAL_POINT=ピント距離
+option.CAMERA_FOCAL_POINT.comment=手動モードでピントを合わせる距離。
+suffix.CAMERA_FOCAL_POINT=m
+
+# DoF Settings
+value.DOF_SAMPLES.DOF_MINIMUM=最低
+value.DOF_SAMPLES.DOF_LOW=低
+value.DOF_SAMPLES.DOF_MEDIUM=中
+value.DOF_SAMPLES.DOF_HIGH=高
+value.DOF_SAMPLES.DOF_ULTRA=ウルトラ
+value.DOF_SAMPLES.DOF_CINEMATIC=シネマティック
+
+option.DOF=被写界深度
+option.DOF.comment=カメラのフォーカス。
+option.DOF_SAMPLES=被写界深度品質
+option.DOF_SAMPLES.comment=ぼけの品質。低 32、中 64、高 128、超高 256、シネマティック 1024。
+
+option.CAMERA_BLADES=絞り羽根数
+option.CAMERA_BLADES.comment=3=三角、4=四角、5=五角、6=六角。
+option.BLADE_ROTATION=羽根回転
+option.BLADE_ROTATION.comment=ボケを中心回転させます。
+option.BLADE_ROUNDING=羽根の丸み
+option.BLADE_ROUNDING.comment=0=角のまま、1=完全な円。
+option.CAMERA_BIAS=カメラバイアス
+option.CAMERA_BIAS.comment=0.0=完全吸収、1.0=完全透過。
+option.LENS_SHIFT_AMOUNT=レンズシフト
+option.DISTORTION_ANAMORPHIC=アナモルフィック歪み
+
+# Lens Settings
+value.BLOOM_SAMPLES.BLOOM_LOW=低
+value.BLOOM_SAMPLES.BLOOM_MEDIUM=中
+value.BLOOM_SAMPLES.BLOOM_HIGH=高
+value.BLOOM_SAMPLES.BLOOM_ULTRA=ウルトラ
+
+option.LENS_FLARE=レンズフレア
+option.LENS_FLARE_STRENGTH=レンズフレア強度
+
+option.VIGNETTE=周辺減光
+option.VIGNETTE_FALLOFF=周辺減光の減衰
+
+option.BLOOM=ブルーム
+option.BLOOM_SAMPLES=ブルーム品質
+option.BLOOM_EV=ブルーム EV
+option.BLOOM_EV.comment=ブルームの明るさを調整します。
+option.BLOOM_CURVE=ブルーム曲線
+
+# Post Process Settings
+option.TONING_FILMIC=フィルムトーンマッピング
+option.SAT_MOD=彩度
+option.SAT_MOD.comment=彩度の補正。
+option.VIB_MOD=自然彩度
+option.VIB_MOD.comment=ビビッドネス補正。
+option.CONT_MOD=コントラスト
+option.CONT_MOD.comment=コントラスト補正。
+option.CONT_MIDPOINT=コントラスト中点
+option.GAMMA_CORRECTION=ガンマ
+option.GAIN_MOD=ゲイン
+option.GAIN_MOD.comment=明るさの直接調整。
+option.LIFT_MOD=リフト
+option.LIFT_MOD.comment=ブラックポイントのシフト。
+option.LUT=LUT
+option.WHITE_BALANCE=ホワイトバランス
+option.TINT_BALANCE=色合い
+
+option.ACES_TOE=トゥ
+option.ACES_SLOPE=スロープ
+option.ACES_SHOULDER=ショルダー
+option.ACES_BLACK_CLIP=ブラッククリップ
+option.ACES_WHITE_CLIP=ホワイトクリップ
+option.ACES_GLOW_GAIN=グロー補正
+option.ACES_GLOW_MID=グロー中点
+option.ACES_EXPAND_GAMUT=色域拡大
+
+# TAA options
+option.TAA_AGGRESSION=TAA 強度
+option.TAA_SHARPNESS=TAA シャープ
+option.TAA_SHARPEN=TAA 強化
+
+# Light Settings
+option.sky_sunLuminanceBase=太陽輝度
+option.sky_sunColorTemperature=太陽色温度
+option.sky_moonLuminanceBase=月輝度
+option.sky_moonColorTemperature=月色温度
+option.TORCH_LUMINANCE=トーチ輝度
+option.TORCH_TEMPERATURE=トーチ色温度
+option.COLORED_LIGHTING=カラーライティング
+option.EMITTER_MASKS=エミッターマスク
+option.HANDHELD_LIGHTS=手持ちライト
+
+suffix.sky_sunColorTemperature=K
+suffix.sky_moonColorTemperature=K
+suffix.TORCH_TEMPERATURE=K
+
+suffix.sky_sunLuminanceBase=lx
+suffix.sky_moonLuminanceBase=lx
+suffix.TORCH_LUMINANCE=lx
+
+# Shadow Settings
+value.SHADOW_QUALITY.SHADOW_MINIMUM=最低
+value.SHADOW_QUALITY.SHADOW_LOW=低
+value.SHADOW_QUALITY.SHADOW_MEDIUM=中
+value.SHADOW_QUALITY.SHADOW_HIGH=高
+value.SHADOW_QUALITY.SHADOW_ULTRA=ウルトラ
+value.SHADOW_QUALITY.SHADOW_CINEMATIC=シネマティック
+
+option.SHADOW_QUALITY=シャドウ品質
+option.SHADOW_QUALITY.comment=影のぼかしの品質。
+option.SHADOW_PENUMBRA_ANGLE=半影角
+option.shadowMapResolution=シャドウマップ解像度
+option.shadowDistance=シャドウ距離
+option.SHADOW_DISTORTION_FACTOR=歪み係数
+
+option.CONTACT_SHADOWS_ENABLED=接触シャドウ
+option.DISTANT_SHADOWS_ENABLED=遠景シャドウ
+
+value.SHADOW_TYPE.SHADOW_HARD=ハードシャドウ
+value.SHADOW_TYPE.SHADOW_SOFT=ソフトシャドウ
+value.SHADOW_TYPE.SHADOW_PCSS=デュアル PCSS
+
+option.SHADOW_TYPE=シャドウタイプ
+
+option.CAUSTICS=コースティクス
+
+# Ambient Settings
+value.AMBIENT_SAMPLES.AMBIENT_MINIMUM=最低
+value.AMBIENT_SAMPLES.AMBIENT_LOW=低
+value.AMBIENT_SAMPLES.AMBIENT_MEDIUM=中
+value.AMBIENT_SAMPLES.AMBIENT_HIGH=高
+value.AMBIENT_SAMPLES.AMBIENT_ULTRA=ウルトラ
+value.AMBIENT_SAMPLES.AMBIENT_CINEMATIC=シネマティック
+
+option.AMBIENT_SAMPLES=アンビエント品質
+option.AMBIENT_SAMPLES.comment=AO の品質。
+
+option.AMBIENT_LUM_OVERWORLD=オーバーワールド疑似アンビエント
+option.AMBIENT_LUM_NETHER=ネザー疑似アンビエント
+option.AMBIENT_LUM_END=エンド疑似アンビエント
+option.NIGHT_VISION_STRENGTH=暗視強度
+
+option.AO_CHEAP=簡易AO
+option.AO_CHEAP.comment=遠方のAOを無効化します。
+
+# Specular Settings
+option.SPECULAR_CLAMP=ハイライトクランプ
+option.SPECULAR_TAIL_CLAMP=クランプオフセット
+value.SPECULAR_QUALITY.SPECULAR_MINIMUM=最低
+value.SPECULAR_QUALITY.SPECULAR_LOW=低
+value.SPECULAR_QUALITY.SPECULAR_MEDIUM=中
+value.SPECULAR_QUALITY.SPECULAR_HIGH=高
+value.SPECULAR_QUALITY.SPECULAR_ULTRA=ウルトラ
+value.SPECULAR_QUALITY.SPECULAR_CINEMATIC=シネマティック
+
+option.SPECULAR_QUALITY=鏡面品質
+option.SPECULAR_QUALITY.comment=ピクセル当たりのスペキュラー光線数。
+
+option.RAIN_PUDDLES=雨の水たまり
+
+option.REFLECT_2D_CLOUDS=2D雲の反射
+option.REFLECT_3D_CLOUDS=3D雲の反射
+option.REFLECTED_CLOUDS_QUALITY=雲反射品質
+option.REFLECTED_CLOUDS_QUALITY_DIRECT=雲反射ライティング品質
+
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_MINIMUM=最低
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_LOW=低
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_MEDIUM=中
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_HIGH=高
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_ULTRA=ウルトラ
+value.REFLECTED_CLOUDS_QUALITY.REFLECTED_CLOUDS_CINEMATIC=シネマティック
+
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_MINIMUM=最低
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_LOW=低
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_MEDIUM=中
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_HIGH=高
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_ULTRA=ウルトラ
+value.REFLECTED_CLOUDS_QUALITY_DIRECT.REFLECTED_CLOUDS_CINEMATIC=シネマティック
+
+value.RAYTRACE_QUALITY.RAYTRACE_MINIMUM=最低
+value.RAYTRACE_QUALITY.RAYTRACE_LOW=低
+value.RAYTRACE_QUALITY.RAYTRACE_MEDIUM=中
+value.RAYTRACE_QUALITY.RAYTRACE_HIGH=高
+value.RAYTRACE_QUALITY.RAYTRACE_ULTRA=ウルトラ
+value.RAYTRACE_QUALITY.RAYTRACE_CINEMATIC=シネマティック
+
+option.RAYTRACE_QUALITY=レイトレース品質
+option.RAYTRACE_QUALITY.comment=光線ごとのマーチ数。
+
+value.RAYTRACE_REFINES.REFINES_MINIMUM=最低
+value.RAYTRACE_REFINES.REFINES_LOW=低
+value.RAYTRACE_REFINES.REFINES_MEDIUM=中
+value.RAYTRACE_REFINES.REFINES_HIGH=高
+value.RAYTRACE_REFINES.REFINES_ULTRA=ウルトラ
+value.RAYTRACE_REFINES.REFINES_CINEMATIC=シネマティック
+
+option.RAYTRACE_REFINES=レイ精度
+option.RAYTRACE_REFINES.comment=光線ごとのリファイン数。
+
+# Parallax Settings
+option.TERRAIN_PARALLAX=地形パララックス
+option.WATER_PARALLAX=水面パララックス
+
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_MINIMUM=最低
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_LOW=低
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_MEDIUM=中
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_HIGH=高
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_ULTRA=ウルトラ
+value.TERRAIN_PARALLAX_SAMPLES.PARALLAX_CINEMATIC=シネマティック
+
+option.TERRAIN_PARALLAX_SAMPLES=視差品質
+option.TERRAIN_PARALLAX_SAMPLES.comment=最大マーチ数。
+
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_MINIMUM=最低
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_LOW=低
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_MEDIUM=中
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_HIGH=高
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_ULTRA=ウルトラ
+value.WATER_PARALLAX_SAMPLES.WPARALLAX_CINEMATIC=シネマティック
+
+option.WATER_PARALLAX_SAMPLES=水面視差品質
+
+option.TERRAIN_PARALLAX_DEPTH=視差の深さ
+option.WATER_PARALLAX_DEPTH=水面視差の深さ
+
+# Material Settings
+value.SPECULAR_MODE.SPECULAR_OLD=旧 PBR
+value.SPECULAR_MODE.SPECULAR_NEW=Continuum PBR
+value.SPECULAR_MODE.SPECULAR_LAB=Lab PBR
+
+option.SPECULAR_MODE=ハイマップ形式
+option.SPECULAR_MODE.comment=shaderLABs 形式は Lab PBR、旧形式は Old PBR を選択。
+
+option.REFRACTION=屈折
+
+# Water Settings 
+option.WATER_SPEED_MULT=水面の速度
+option.WAVE_HEIGHT_MULT=波の高さ
+option.HORIZON_WAVE_FADE=地平線波のフェード
+option.HORIZON_WAVE_FADE_FALLOFF=波フェード減衰
+
+# Atmospheric Settings
+option.CLOUDS_2D=2D雲
+option.CLOUDS_2D_DENSITY=2D雲の密度
+option.CLOUDS_2D_COVERAGE=2D雲のカバー率
+
+option.VOLUMETRIC_CLOUDS=体積雲
+
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_MINIMUM=最低
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_LOW=低
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_MEDIUM=中
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_HIGH=高
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_ULTRA=ウルトラ
+value.VOLUMETRIC_CLOUDS_QUALITY.VC_CINEMATIC=シネマティック
+
+option.VOLUMETRIC_CLOUDS_QUALITY=体積雲品質
+
+option.VOLUMETRIC_CLOUDS_ALTITUDE=高度
+option.VOLUMETRIC_CLOUDS_SPEED=雲の速度
+option.VOLUMETRIC_CLOUDS_DENSITY=密度
+option.VOLUMETRIC_CLOUDS_COVERAGE=カバレッジ
+option.VOLUMETRIC_CLOUDS_HEIGHT=厚み
+option.VOLUMETRIC_CLOUDS_SCALE=スケール
+
+option.VOLUMETRIC_CLOUDS_SHADOWS=雲の影
+
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_MINIMUM=最低
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_LOW=低
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_MEDIUM=中
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_HIGH=高
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_ULTRA=ウルトラ
+value.VOLUMETRIC_CLOUDS_DIRECT_QUALITY.VCL_CINEMATIC=シネマティック
+
+option.VOLUMETRIC_CLOUDS_DIRECT_QUALITY=太陽光品質
+
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_MINIMUM=最低
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_LOW=低
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_MEDIUM=中
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_HIGH=高
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_ULTRA=ウルトラ
+value.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY.VCL_CINEMATIC=シネマティック
+
+option.VOLUMETRIC_CLOUDS_INDIRECT_QUALITY=天光品質
+
+option.VOLUMETRIC_LIGHT=ボルメトリックライト
+
+option.WATER_VOLUMETRIC_LIGHT=水中ボルメトリックライト
+option.WATER_VL_QUALITY=水中VL品質
+
+value.VL_QUALITY.VL_MINIMUM=最低
+value.VL_QUALITY.VL_LOW=低
+value.VL_QUALITY.VL_MEDIUM=中
+value.VL_QUALITY.VL_HIGH=高
+value.VL_QUALITY.VL_ULTRA=ウルトラ
+value.VL_QUALITY.VL_CINEMATIC=シネマティック
+
+value.WATER_VL_QUALITY.WATER_VL_MINIMUM=最低
+value.WATER_VL_QUALITY.WATER_VL_LOW=低
+value.WATER_VL_QUALITY.WATER_VL_MEDIUM=中
+value.WATER_VL_QUALITY.WATER_VL_HIGH=高
+value.WATER_VL_QUALITY.WATER_VL_ULTRA=ウルトラ
+value.WATER_VL_QUALITY.WATER_VL_CINEMATIC=シネマティック
+
+option.VL_QUALITY=VL品質
+
+option.AERIAL_VL=大気ボルメトリック
+
+option.VL_COLOURED_SHADOW=カラーシャドウ
+
+option.VL_CLOUD_SHADOW=雲影
+option.VL_SELF_SHADOW=自己影
+
+option.FOG_DENSITY_RAYLEIGH=環境レイリー密度
+option.FOG_DENSITY_MIE_AMBIENT=環境ミー密度
+option.RAIN_CLOUD_DENSITY=雨雲密度
+option.FOG_MORNING_DENSITY=朝霧密度
+option.FOG_DENSITY_AMBIENT_BASE_HEIGHT=環境霧の高さ
+option.FOG_MORNING_BASE_HEIGHT=朝霧の高さ
+option.FOG_DENSITY_AMBIENT_FALLOFF=環境霧の減衰
+option.FOG_MORNING_FALLOFF=朝霧の減衰
+option.DISTANCE_FADE=距離フェード
+option.LPV_FOG_STRENGTH_OVERWORLD=LPV霧強度
+option.LPV_FOG_STRENGTH_NETHER=LPV霧強度
+option.LPV_FOG_STRENGTH_END=LPV霧強度
+
+option.END_FOG_DENSITY_GLOBAL=全体フォグ密度
+option.END_FOG_DENSITY_MIE=ミー密度
+option.END_FOG_DENSITY_RAYLEIGH=レイリー密度
+option.END_FOG_FALLOFF=減衰
+
+option.NETHER_FOG_DENSITY_GLOBAL=全体フォグ密度
+option.NETHER_FOG_DENSITY_MIE=ミー密度
+option.NETHER_FOG_DENSITY_RAYLEIGH=レイリー密度
+
+#global illumination Settings
+option.GLOBAL_ILLUMINATION=グローバルイルミネーション
+option.GI_RADIUS=GI 半径
+option.GI_QUALITY=GI 品質
+
+value.GI_QUALITY.GI_MINIMUM=最低
+value.GI_QUALITY.GI_LOW=低
+value.GI_QUALITY.GI_MEDIUM=中
+value.GI_QUALITY.GI_HIGH=高
+value.GI_QUALITY.GI_ULTRA=ウルトラ
+value.GI_QUALITY.GI_CINEMATIC=シネマティック
+
+option.TIME_SPEED=時間速度
+option.WHITE_WORLD=ホワイトワールド
+
+# Debug settings
+option.DEBUG=デバッグ
+option.DEBUG_VIEW=デバッグビュー
+value.DEBUG_VIEW.-1=gbuffers_solid
+value.DEBUG_VIEW.0=deferred
+value.DEBUG_VIEW.9=gbuffers_translucent
+value.DEBUG_VIEW.10=composite
+value.DEBUG_VIEW.11=composite1
+value.DEBUG_VIEW.12=composite2
+value.DEBUG_VIEW.13=composite3
+value.DEBUG_VIEW.20=final

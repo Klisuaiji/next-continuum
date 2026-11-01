@@ -1,0 +1,28 @@
+name: shader-static-checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install glslang
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y glslang-tools
+
+      - name: Include graph validation
+        run: python3 scripts/check_includes.py shaders
+
+      - name: Resources & integration surface
+        run: python3 scripts/check_resources.py shaders
+
+      - name: GLSL baseline diff (no new failures allowed)
+        run: python3 scripts/check_glsl.py shaders
+
+      - name: LOD macro variants compile clean (VOXY / DISTANT_HORIZONS)
+        run: python3 scripts/check_lod_macros.py shaders

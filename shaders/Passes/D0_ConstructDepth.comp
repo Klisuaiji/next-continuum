@@ -11,10 +11,9 @@ const vec2 workGroupsRender = vec2(1.0, 1.0);
 #include "../InternalLib/Common/SpaceConversions.glsl"
 
 uniform sampler2D depthtex0, depthtex1;
-uniform sampler2D vxDepthTexOpaque, vxDepthTexTrans;
 
-uniform mat4 vxProj, vxProjInv;
-uniform mat4 gbufferProjection, gbufferProjectionInverse;
+#include "../InternalLib/Common/LodSupport.glsl"
+
 
 uniform vec2 viewDimensions;
 
@@ -22,30 +21,30 @@ void main() {
     ivec2 iPos = ivec2(gl_GlobalInvocationID.xy);
     vec2 texcoord = (iPos + 0.5) / floor(viewDimensions * workGroupsRender);
 
-    #ifdef VOXY
-        float frontDepthDH = texture(vxDepthTexTrans, texcoord).x;
-        vec3 frontDHView = CalculateViewSpacePosition(vec3(texcoord, frontDepthDH), vxProjInv);
+    #ifdef LOD_PRESENT
+        float frontDepthLod = texture(lod_depth_tex, texcoord).x;
+        vec3 frontLodView = CalculateViewSpacePosition(vec3(texcoord, frontDepthLod), lod_projection_matrix_inverse);
 
         float frontDepthMc = texture(depthtex0, texcoord).x;
         vec3 frontMcView = CalculateViewSpacePosition(vec3(texcoord, frontDepthMc), CameraTransforms.projectionMatrixInverse);
 
-        float backDepthDH = texture(vxDepthTexOpaque, texcoord).x;
-        vec3 backDHView = CalculateViewSpacePosition(vec3(texcoord, backDepthDH), vxProjInv);
+        float backDepthLod = texture(lod_depth_tex_solid, texcoord).x;
+        vec3 backLodView = CalculateViewSpacePosition(vec3(texcoord, backDepthLod), lod_projection_matrix_inverse);
 
         float backDepthMc = texture(depthtex1, texcoord).x;
         vec3 backMcView = CalculateViewSpacePosition(vec3(texcoord, backDepthMc), CameraTransforms.projectionMatrixInverse);
 
-        vec3 frontView = abs(frontMcView.z) > abs(frontDHView.z) ? frontDHView : frontMcView; 
-        vec3 backView = abs(backMcView.z) > abs(backDHView.z) ? backDHView : backMcView; 
+        vec3 frontView = abs(frontMcView.z) > abs(frontLodView.z) ? frontLodView : frontMcView; 
+        vec3 backView = abs(backMcView.z) > abs(backLodView.z) ? backLodView : backMcView; 
 
         float frontDepthSS = ViewSpaceToScreenSpace(frontView, CameraTransforms.projectionMatrix).z;
         float backDepthSS = ViewSpaceToScreenSpace(backView, CameraTransforms.projectionMatrix).z;
 
-        if (backDepthMc >= 1.0 && backDepthDH >= 1.0) {
+        if (backDepthMc >= 1.0 && backDepthLod >= 1.0) {
             backDepthSS = 1.0;
         }
 
-        if (frontDepthMc >= 1.0 && frontDepthDH >= 1.0) {
+        if (frontDepthMc >= 1.0 && frontDepthLod >= 1.0) {
             frontDepthSS = 1.0;
         }
 
