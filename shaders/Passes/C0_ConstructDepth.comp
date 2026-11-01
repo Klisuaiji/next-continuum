@@ -17,6 +17,8 @@ uniform sampler2D depthtex0, depthtex1;
 
 
 uniform vec2 viewDimensions;
+uniform float fov;
+uniform float aspectRatio;
 
 void main() {
     ivec2 iPos = ivec2(gl_GlobalInvocationID.xy);
