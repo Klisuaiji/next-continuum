@@ -12,7 +12,7 @@ varying vec3 dh_worldNormal;
 
 void main() {
     // Iris rewrites these compatibility built-ins to the DH program's
-    // iris_ModelViewMatrix / iris_ProjectionMatrix uniforms.
+    // DH pass 对应的视图与投影矩阵。
     vec3 viewPos = transMAD(gl_ModelViewMatrix, gl_Vertex.xyz);
     gl_Position = gl_ProjectionMatrix * vec4(viewPos, 1.0);
 
