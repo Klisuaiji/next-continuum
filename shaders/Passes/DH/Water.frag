@@ -10,6 +10,7 @@
 #include "../../InternalLib/Fragment/WaterWaves.fsh"
 
 uniform sampler2D texture;
+uniform sampler2D waveTex;
 uniform vec3 cameraPosition;
 
 varying vec4 dh_color;
