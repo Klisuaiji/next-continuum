@@ -46,6 +46,16 @@
 #define VCS_ULTRA 7
 #define VCS_CINEMATIC 9
 
+// --- 2.1.3 新体云增强（VOLUMETRIC_CLOUDS_V2）：自适应非线性步长 + 多重散射 + 改进 powder。
+// 默认关：取消下一行注释即在 [CLOUDS] 菜单开启；关闭时完全走旧体云，零回归。
+//#define VOLUMETRIC_CLOUDS_V2
+#define VC2_MULTISCAT_TERMS 4 // [2 3 4 5 6]
+#define VC2_MULTISCAT_G_DECAY 0.5
+#define VC2_MULTISCAT_ENERGY 0.5
+#define VC2_FORWARD_G 0.8
+#define VC2_BACKWARD_G -0.5
+#define VC2_MIX_G 0.5
+#define VC2_STEP_POWER 2.0 // [1.5 2.0 2.5 3.0]
 #define VOLUMETRIC_CLOUDS_SHADOWS
 #define CLOUD_SHADOWMAP_RADIUS 2048
 

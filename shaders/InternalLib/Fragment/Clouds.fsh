@@ -307,3 +307,120 @@ float SampleCloudShadowMap(sampler2D cloudShadowTex, vec3 worldPos, vec2 rand) {
     return cloudSample;
 }
 
+/* ============================================================
+ * 2.1.3 新体云（VOLUMETRIC_CLOUDS_V2）
+ * 自研重写，参考 2.1.3 volumetricClouds.glsl 的三项核心增量：
+ *  1) 自适应非线性步长（近处密、远处疏，幂分布）
+ *  2) 多重散射 Henyey-Greenstein 相位（VC2_MULTISCAT_TERMS 项）
+ *  3) 改进 powder（深度增亮 x 高度项，云边缘增亮）
+ * 复用本文件的密度 GetVolumetricClouds 与太阳/天空透光度 march，不新增 image。
+ * ============================================================ */
+
+// Henyey-Greenstein 相位（单 lobe）
+float VC2PhaseG(float cosTheta, float g) {
+    float gg = g * g;
+    return rPI * (0.25 - 0.25 * gg) * pow(gg + 1.0 - 2.0 * g * cosTheta, -1.5);
+}
+
+// 多重散射相位：前/后双 lobe，逐次降低 g 并按能量衰减加权
+float VC2MultiScatterPhase(float VoL) {
+    float accum = 0.0;
+    float cn = 1.0;
+    for (int i = 0; i < VC2_MULTISCAT_TERMS; ++i) {
+        float pF = VC2PhaseG(VoL, VC2_FORWARD_G  * cn);
+        float pB = VC2PhaseG(VoL, VC2_BACKWARD_G * cn);
+        accum += mix(pB, pF, VC2_MIX_G) * pow(VC2_MULTISCAT_ENERGY, float(i));
+        cn *= VC2_MULTISCAT_G_DECAY;
+    }
+    return accum;
+}
+
+// 改进 powder：2.1.3 风格的深度增亮 x 高度项
+float VC2Powder(float density, float normalizedHeight, float VoL) {
+    float r = pow2(VoL * 0.5 + 0.5);
+    float heightTerm = normalizedHeight * (1.0 - r) + r;
+    float depthTerm = 1.0 - exp2(-density * 2.0 * rLOG2);
+    return depthTerm * heightTerm;
+}
+
+vec2 CalculateCloudScatteringV2(
+    vec3 position, float multiPhase, float VoL, const VolumetricCloudSettings vcs,
+    float odSample, int dirLightSteps, float normalizedHeight
+) {
+    float sunVisibility = CalculateCloudSunVisibility(position, vcs, dirLightSteps, true, true);
+    float skyVisibility = CalculateCloudSkyVisibility(position, true);
+
+    float sunLighting = sunVisibility * VC2Powder(odSample, normalizedHeight, VoL) * multiPhase * PI * 2.0;
+    float skyLighting = skyVisibility * VC2PhaseG(VoL, 0.0) * PI;
+
+    return vec2(sunLighting, skyLighting);
+}
+
+vec4 CalculateVolumetricCloudsV2(
+    vec3 worldVector, float depth, float dither, float terrainDistance,
+    const int steps, const int dirLightSteps
+) {
+    #ifndef VOLUMETRIC_CLOUDS
+        return vec4(0.0, 0.0, 1.0, 1e9);
+    #endif
+
+    float transmittance = 1.0;
+    vec2 scattering = vec2(0.0);
+
+    const float maxAltitude = cloudAltitude + cloudHeight;
+    const float cloudScale = cloudAltitude / 1600.0;
+    const VolumetricCloudSettings vcs = VolumetricCloudSettings(
+        cloudAltitude, maxAltitude, cloudHeight, cloudCoverage, cloudDensity, cloudScale);
+
+    float VoL = dot(worldVector, SceneData.wLightVector);
+    float multiPhase = VC2MultiScatterPhase(VoL);
+
+    // 与旧版一致的行星球面出入点（复用 rsi）
+    vec2 planetIntersection = rsi(vec3(0.0, atmosphere_planetRadius + cameraPosition.y, 0.0), worldVector, atmosphere_planetRadius);
+    vec2 outerIntersection  = rsi(vec3(0.0, atmosphere_planetRadius + cameraPosition.y, 0.0), worldVector, atmosphere_planetRadius + vcs.maxAltitude);
+    if (outerIntersection.y <= 0.0) return vec4(0.0, 0.0, 1.0, 1e9);
+    vec2 innerIntersection = rsi(vec3(0.0, atmosphere_planetRadius + cameraPosition.y, 0.0), worldVector, atmosphere_planetRadius + vcs.minAltitude);
+    if (planetIntersection.x > 0.0 && cameraPosition.y < vcs.minAltitude) return vec4(0.0, 0.0, 1.0, 1e9);
+
+    float startDistance = cameraPosition.y < vcs.minAltitude ? innerIntersection.y : outerIntersection.x;
+    float endDistance   = cameraPosition.y < vcs.minAltitude ? outerIntersection.y : innerIntersection.x;
+    startDistance = (cameraPosition.y > vcs.minAltitude && cameraPosition.y < vcs.maxAltitude) ? 0.0 : startDistance;
+    endDistance   = (cameraPosition.y > vcs.minAltitude && cameraPosition.y < vcs.maxAltitude)
+        ? min((innerIntersection.y >= 0.0 ? innerIntersection.x : outerIntersection.y), 2048.0) : endDistance;
+
+    vec3 startPos = startDistance * worldVector;
+    vec3 endPos   = endDistance * worldVector;
+    float cloudDistance = length(endPos);
+
+    // 自适应非线性步长：t 在 0..1 上取幂分布（近处密、远处疏）
+    float N = float(steps);
+    for (int i = 0; i < steps; ++i) {
+        float t0 = pow(float(i)     / N, VC2_STEP_POWER);
+        float t1 = pow(float(i + 1) / N, VC2_STEP_POWER);
+        float tm = mix(t0, t1, dither);
+
+        vec3 position = cameraPosition + mix(startPos, endPos, tm);
+
+        // 地形遮挡：采样点越过不透明地形则停止
+        if (terrainDistance < length(position - cameraPosition) && depth < 1.0) break;
+
+        float stepLength = length(mix(startPos, endPos, t1) - mix(startPos, endPos, t0));
+        float odSample = GetVolumetricClouds(position, vcs, true) * vcs.cloudDensity * stepLength;
+        if (odSample <= 0.0) continue;
+
+        float sampleTransmittance = exp2(-odSample * rLOG2);
+        float normalizedHeight = clamp01((position.y - vcs.minAltitude) / vcs.cloudHeight);
+
+        vec2 cloudScattering = CalculateCloudScatteringV2(
+            position, multiPhase, VoL, vcs, odSample, dirLightSteps, normalizedHeight);
+
+        scattering += cloudScattering * (transmittance - transmittance * sampleTransmittance);
+        transmittance *= sampleTransmittance;
+
+        if (transmittance <= VOLUMETRIC_CLOUDS_MIN_TRANSMITTANCE) break;
+        cloudDistance = min(cloudDistance, length(position - cameraPosition));
+    }
+
+    transmittance = clamp01(remap(transmittance, VOLUMETRIC_CLOUDS_MIN_TRANSMITTANCE, 1.0, 0.0, 1.0));
+    return vec4(scattering, transmittance, cloudDistance);
+}

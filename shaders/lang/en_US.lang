@@ -332,6 +332,7 @@ option.CLOUDS_2D_DENSITY=2D Cloud Density
 option.CLOUDS_2D_COVERAGE=2D Cloud Coverage
 
 option.VOLUMETRIC_CLOUDS=Volumetric Clouds
+option.VOLUMETRIC_CLOUDS_V2=Volumetric Clouds V2 (2.1.3)
 
 value.VOLUMETRIC_CLOUDS_QUALITY.VC_MINIMUM=Minimum
 value.VOLUMETRIC_CLOUDS_QUALITY.VC_LOW=Low

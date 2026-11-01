@@ -114,7 +114,11 @@ void main() {
 
     VolumetricData vd = CalculateVolumetricVariables(viewVector, VoL);
 
-    vec4 clouds = CalculateVolumetricClouds(worldVector, depth, dither, length(position[1]), VOLUMETRIC_CLOUDS_QUALITY, VOLUMETRIC_CLOUDS_DIRECT_QUALITY, true, false);
+    #ifdef VOLUMETRIC_CLOUDS_V2
+        vec4 clouds = CalculateVolumetricCloudsV2(worldVector, depth, dither, length(position[1]), VOLUMETRIC_CLOUDS_QUALITY, VOLUMETRIC_CLOUDS_DIRECT_QUALITY);
+    #else
+        vec4 clouds = CalculateVolumetricClouds(worldVector, depth, dither, length(position[1]), VOLUMETRIC_CLOUDS_QUALITY, VOLUMETRIC_CLOUDS_DIRECT_QUALITY, true, false);
+    #endif
     vec2 motionVector = CalculateCloudMotionVectors(nCoord, worldVector * clouds.a);
 
     imageStore(cloudImg, iPos, clouds);
