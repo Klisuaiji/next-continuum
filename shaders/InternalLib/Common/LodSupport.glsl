@@ -1,8 +1,7 @@
 // ============================================================
 // Next Continuum · LOD 抽象层（自研）
 // 唯一 LOD 语义入口：包内消费方通过统一名称访问 DH / Voxy。
-// Iris 的 DH 专用程序使用 iris_ProjectionMatrix /
-// iris_ModelViewMatrix（由 gl_* 内建矩阵重写而来）；
+// Iris 的 DH 专用程序会把兼容矩阵绑定到 DH pass 自己的投影与视图矩阵；
 // 普通合成阶段没有可用的 dhProjection uniform，因此深度重建
 // 使用 DH near/far + 当前视场构造透视矩阵，不伪造 Iris uniform。
 // ============================================================
