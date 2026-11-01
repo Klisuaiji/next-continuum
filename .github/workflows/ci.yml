@@ -26,3 +26,16 @@ jobs:
 
       - name: LOD macro variants compile clean (VOXY / DISTANT_HORIZONS)
         run: python3 scripts/check_lod_macros.py shaders
+
+      - name: Package shader pack
+        run: |
+          mkdir -p "$RUNNER_TEMP/next-continuum"
+          zip -r "$RUNNER_TEMP/next-continuum/next-continuum.zip" shaders pack.mcmeta
+
+      - name: Upload shader pack artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-continuum-shaderpack
+          path: ${{ runner.temp }}/next-continuum/next-continuum.zip
+          if-no-files-found: error
+          retention-days: 14
