@@ -6,6 +6,7 @@
 # shaders/lang/en_US.lang
 
 # Profiles
+profile.POTATO=Potato
 profile.MINIMUM=Minimum
 profile.LOW=Low
 profile.MEDIUM=Medium
@@ -444,3 +445,9 @@ value.DEBUG_VIEW.11=composite1
 value.DEBUG_VIEW.12=composite2
 value.DEBUG_VIEW.13=composite3
 value.DEBUG_VIEW.20=final
+option.QUICK_FILTER=Quick Filter
+value.QUICK_FILTER.QUICK_FILTER_NATURAL=Natural
+value.QUICK_FILTER.QUICK_FILTER_VIVID=Vivid
+value.QUICK_FILTER.QUICK_FILTER_CINEMATIC=Cinematic
+value.QUICK_FILTER.QUICK_FILTER_MOODY=Moody
+value.QUICK_FILTER.QUICK_FILTER_CLEAR_WATER=Clear Water

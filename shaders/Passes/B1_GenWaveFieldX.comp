@@ -6,6 +6,7 @@ const ivec3 workGroups = ivec3(1, 1024, 1);
 #include "../InternalLib/Syntax.glsl"
 #include "../InternalLib/Utilities.glsl"
 #include "../InternalLib/Debug.glsl"
+#include "../UserLib/QuickFilterSettings.glsl"
 
 uniform float frameTimeCounter;
 uniform float rainStrength;
@@ -20,7 +21,7 @@ void main() {
     InitRand(uint(gl_GlobalInvocationID.x + 1024 * gl_GlobalInvocationID.y));
 
     vec2 k = GetWaveFieldCoord(ShiftCoordinates(iPos));
-    Complex waveAmplitudes = ComputeWaveAmplitudes(k, TIME * WATER_SPEED_MULT);
+    Complex waveAmplitudes = ComputeWaveAmplitudes(k, TIME * QF_WATER_SPEED);
 
     RowPreload(iPos, waveAmplitudes);
     barrier();

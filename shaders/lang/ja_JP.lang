@@ -6,6 +6,7 @@
 # shaders/lang/ja_JP.lang（日本語、Next Continuum 機械補助翻訳）
 
 # Profiles
+profile.POTATO=ポテト
 profile.MINIMUM=最低
 profile.LOW=低
 profile.MEDIUM=中
@@ -444,3 +445,9 @@ value.DEBUG_VIEW.11=composite1
 value.DEBUG_VIEW.12=composite2
 value.DEBUG_VIEW.13=composite3
 value.DEBUG_VIEW.20=final
+option.QUICK_FILTER=クイックフィルター
+value.QUICK_FILTER.QUICK_FILTER_NATURAL=ナチュラル
+value.QUICK_FILTER.QUICK_FILTER_VIVID=ビビッド
+value.QUICK_FILTER.QUICK_FILTER_CINEMATIC=シネマティック
+value.QUICK_FILTER.QUICK_FILTER_MOODY=ムーディー
+value.QUICK_FILTER.QUICK_FILTER_CLEAR_WATER=クリアウォーター

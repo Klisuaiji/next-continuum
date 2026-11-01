@@ -6,6 +6,7 @@
 # shaders/lang/zh_CN.lang（Next Continuum 简体中文，术语表驱动机辅翻译，请配合上游更新校对）
 
 # Profiles
+profile.POTATO=马铃薯
 profile.MINIMUM=最低
 profile.LOW=低
 profile.MEDIUM=中
@@ -444,3 +445,9 @@ value.DEBUG_VIEW.11=composite1
 value.DEBUG_VIEW.12=composite2
 value.DEBUG_VIEW.13=composite3
 value.DEBUG_VIEW.20=final
+option.QUICK_FILTER=快速滤镜
+value.QUICK_FILTER.QUICK_FILTER_NATURAL=自然
+value.QUICK_FILTER.QUICK_FILTER_VIVID=鲜艳
+value.QUICK_FILTER.QUICK_FILTER_CINEMATIC=电影
+value.QUICK_FILTER.QUICK_FILTER_MOODY=暗调
+value.QUICK_FILTER.QUICK_FILTER_CLEAR_WATER=清澈水

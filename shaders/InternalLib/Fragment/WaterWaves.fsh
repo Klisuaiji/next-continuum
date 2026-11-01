@@ -6,6 +6,7 @@
 
 
 #include "/InternalLib/Misc/NoiseTexture.glsl"
+#include "/UserLib/QuickFilterSettings.glsl"
 
 float GerstnerWave(vec2 coord, vec2 waveDirection, float globalTime, float waveSteepness, float waveAmplitude, float waveLength) {
     const float g = 19.6;
@@ -22,7 +23,7 @@ float GerstnerWave(vec2 coord, vec2 waveDirection, float globalTime, float waveS
 }
 
 float GetWavesHeight(sampler2D waveTex, vec3 worldPosition, float NoV) {
-    float height = texture(waveTex, fract(worldPosition.xz * 0.1)).x * WAVE_HEIGHT_MULT - 1.0;
+    float height = texture(waveTex, fract(worldPosition.xz * 0.1)).x * QF_WAVE_HEIGHT - 1.0;
 
     #ifdef HORIZON_WAVE_FADE
         float fade = 1.0 - exp(-HORIZON_WAVE_FADE_FALLOFF * abs(NoV));

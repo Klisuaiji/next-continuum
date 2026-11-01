@@ -107,6 +107,7 @@ vec3 vignette(vec3 color, vec2 uv) {
 #include "../InternalLib/Fragment/Camera.fsh"
 #include "../InternalLib/Fragment/PostProcess.fsh"
 #include "../InternalLib/Fragment/ACES.glsl"
+#include "../UserLib/QuickFilterSettings.glsl"
 
 /*******************************************************************************
   - Toning
@@ -152,6 +153,12 @@ void main() {
 	#ifdef LENS_FLARE
 		GetLensFlare(currentColor);
 	#endif
+
+	// Quick Filter: lighting-mood deltas (layered pre-tonemap; NATURAL = no-op).
+	currentColor = mix(vec3(RGBToLuma(currentColor)), currentColor, vec3(1.0 + QF_SATURATION));
+	currentColor = (currentColor - 0.5) * (1.0 - QF_CONTRAST * 0.5) + 0.5;
+	currentColor *= (1.0 + QF_GAIN);
+	EV *= exp2(QF_EV);
 
 	//Expose Final Color and bloom.
 	currentColor *= EV;

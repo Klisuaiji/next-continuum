@@ -6,6 +6,7 @@
 # shaders/lang/zh_TW.lang（繁體中文，由簡體自動轉換）
 
 # Profiles
+profile.POTATO=馬鈴薯
 profile.MINIMUM=最低
 profile.LOW=低
 profile.MEDIUM=中
@@ -444,3 +445,9 @@ value.DEBUG_VIEW.11=composite1
 value.DEBUG_VIEW.12=composite2
 value.DEBUG_VIEW.13=composite3
 value.DEBUG_VIEW.20=final
+option.QUICK_FILTER=快速濾鏡
+value.QUICK_FILTER.QUICK_FILTER_NATURAL=自然
+value.QUICK_FILTER.QUICK_FILTER_VIVID=鮮豔
+value.QUICK_FILTER.QUICK_FILTER_CINEMATIC=電影
+value.QUICK_FILTER.QUICK_FILTER_MOODY=暗調
+value.QUICK_FILTER.QUICK_FILTER_CLEAR_WATER=清澈水
