@@ -65,9 +65,9 @@ screen.VLIGHT_END=End Fog Settings
 value.CAMERA_MODE.CAMERA_AUTO=Auto
 value.CAMERA_MODE.CAMERA_MANUAL=Manual
 
-option.INFO = Continuum 2.0 Redux
-value.INFO.0 = by uvraj
-value.INFO.1 = by uvraj
+option.INFO=Continuum 2.0 Redux
+value.INFO.0=by uvraj
+value.INFO.1=by uvraj
 
 option.CAMERA_MODE=Camera Mode
 option.CAMERA_MODE.comment=Operating mode of the camera. 'Auto' is best for gameplay, where the camera will adjust itself. 'Manual' is best for screenshots and cinematics, where precise control over the camera is necessary.
@@ -403,9 +403,9 @@ option.FOG_DENSITY_MIE_AMBIENT=Ambient Mie Density
 option.RAIN_CLOUD_DENSITY=Rain Cloud Density
 option.FOG_MORNING_DENSITY=Morning Fog Density
 option.FOG_DENSITY_AMBIENT_BASE_HEIGHT=Ambient Fog Height
-option.FOG_MORNING_BASE_HEIGHT = Morning Fog Height 
-option.FOG_DENSITY_AMBIENT_FALLOFF = Ambient Fog Falloff
-option.FOG_MORNING_FALLOFF = Morning Fog Falloff
+option.FOG_MORNING_BASE_HEIGHT=Morning Fog Height
+option.FOG_DENSITY_AMBIENT_FALLOFF=Ambient Fog Falloff
+option.FOG_MORNING_FALLOFF=Morning Fog Falloff
 option.DISTANCE_FADE=Distance Fade
 option.LPV_FOG_STRENGTH_OVERWORLD=LPV Fog Strength
 option.LPV_FOG_STRENGTH_NETHER=LPV Fog Strength

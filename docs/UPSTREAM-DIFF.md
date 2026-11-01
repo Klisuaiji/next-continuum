@@ -67,6 +67,67 @@ LOD 阴影调研结论（2026-10-31，Iris 1.21.11 + Voxy dev 源码核验）：
 | `shaders/lang/zh_TW.lang` | 新增 | 繁体中文（OpenCC s2twp 自动转换） |
 | `shaders/lang/ja_JP.lang` | 新增 | 日文全量 446 键 |
 
+### S3 快速滤镜 + 七档 profile + 开关框架（提交 7cea240）
+
+| 文件 | 类型 | 说明 | rebase 难度 |
+|---|---|---|---|
+| `shaders/UserLib/QuickFilterSettings.glsl` | 新增 | QUICK_FILTER 五档水波/光线预设（NATURAL/VIVID/CINEMATIC/MOODY/CLEAR_WATER） | 无（纯新增） |
+| `shaders/UserLib/AdvancedSettings.glsl` | 新增 | M1-M6 特性开关脚手架，全部默认注释关 | 无 |
+| `shaders/Passes/B1_GenWaveFieldX.comp`、`InternalLib/Fragment/WaterWaves.fsh` | 修改 | 水波预设 delta 接入（NATURAL 零改动） | 低 |
+| `shaders/Passes/C7_PostProcess1.frag` | 修改 | 色调/曝光 delta 接入点（tonemap 前） | 低 |
+| `shaders/shaders.properties` | 修改 | 七档 profile（POTATO→CINEMATIC）+ QUICK_FILTER 菜单 | 低 |
+| 四语 lang | 修改 | 新增选项文案 | 无 |
+
+### S4 M1 自动曝光 + M6 完整 ACES（提交 31b1174）
+
+| 文件 | 类型 | 说明 | rebase 难度 |
+|---|---|---|---|
+| `shaders/Passes/A0_AutoExposureClear.comp`、`A1_GenHistogram.comp`、`A2_AdaptExposure.comp` | 新增 | M1 三段 compute：清累加器/直方图/时序自适应，自门控 AUTO_EXPOSURE | 无（纯新增） |
+| `shaders/InternalLib/Syntax.glsl` | 修改 | 新增 binding=4 std430 直方图 SSBO（bufferObject.4） | 低 |
+| `shaders/Passes/C7_PostProcess1.frag` | 修改 | 自动曝光值在手动模式外覆盖每像素亮度 | 低 |
+| `shaders/InternalLib/Fragment/ACES.glsl` | 修改 | M6 FULL_ACES 下激活完整 RRT/ODT（#ifdef 门控，默认关） | 低 |
+| `shaders/shaders.properties` + 四语 lang | 修改 | EXPERIMENTAL 菜单与文案 | 无 |
+
+### S5 CI 修复（提交 f7e16b4 等）
+
+| 文件 | 类型 | 说明 |
+|---|---|---|
+| `A1_GenHistogram.comp` | 修改 | 自包含化（pixelSize 加 location、去 Camera.fsh 依赖） |
+| `scripts/glsl_baseline.json` | 修改 | 242→245，吸收 Passes/*.comp 无 #version 既有类伪失败 |
+
+### S6 三个 fix 分支合并（合并提交 745a1dc、1306e72）
+
+| 来源分支 | 文件 | 说明 |
+|---|---|---|
+| fix/dh-water-wavetex-uniform | `Passes/DH/Water.frag` | 补 waveTex 采样器声明，修复 C1503 undefined variable |
+| fix/production-stability | `A1_GenHistogram.comp`、`.github/workflows/ci.yml` | 直方图改核心 GLSL texture()；CI 增加打包上传 artifact |
+| fix/dh-iris-interface | `Passes/DH/*`、`InternalLib/*` 多文件 | 13 提交对齐 DH 着色器与 Iris DH 接口；唯一冲突 DH/Water.fsh 取分支侧 |
+
+### S7 2.1.3 新体云 V2（提交 a0a34ea）
+
+| 文件 | 类型 | 说明 | rebase 难度 |
+|---|---|---|---|
+| `shaders/UserLib/VolumetricSettings.glsl` | 修改 | 新增 VOLUMETRIC_CLOUDS_V2 开关（默认注释关）+ 8 个 VC2_* 常量 | 低 |
+| `shaders/InternalLib/Fragment/Clouds.fsh` | 修改 | 追加 V2 五函数：自适应非线性步长 + 多重散射 HG 相位 + 改进 powder；复用密度/rsi/透光度，不新增 image | 低 |
+| `shaders/Passes/C2_RenderClouds.comp` | 修改 | #ifdef V2 分支接线，旧函数保持 | 低 |
+| `shaders/shaders.properties` + 四语 lang | 修改 | CLOUDS 菜单与文案 | 无 |
+
+### S8 本地化格式规范化（本次提交）
+
+| 文件 | 类型 | 说明 |
+|---|---|---|
+| `shaders/lang/en_US.lang` | 修改 | 6 个键定义由 `key = value` 规范化为 `key=value`，与其他三语统一；文案内容不变 |
+
+### S9 预处理器模拟修正 + V2 接线修复（本次提交）
+
+| 文件 | 类型 | 说明 |
+|---|---|---|
+| `scripts/check_includes.py` | 修改 | 修复 expand 替换 #include 时丢失指令行换行的缺陷：被 include 文件末尾无换行时补回行尾，正确模拟真实预处理器（换行结束指令） |
+| `scripts/glsl_baseline.json` | 修改 | 245→237：粘连修正后 8 个 entry（begin2/composite1/composite4_a/composite9，两维度）rc=0 转为通过，基线吸收该改善 |
+| `shaders/InternalLib/Fragment/Clouds.fsh` | 修改 | 修复 V2 调用 CalculateCloudSkyVisibility 漏传 vcs 参数（2 参→3 参），与真实函数签名匹配 |
+
+V2 深度验证结论：修复后在真实 C2 融合上下文（V2 开）中，V2 主函数（融合文件 2331→2398 行）在 include 链既有的上游 texture2D 阻断点之前被完整、干净地解析；V2 关/开在相同补全下错误集合完全一致，V2 未引入任何新错误。
+
 ### 计划改动（实施时逐条登记）
 
 - S1：`InternalLib/Common/LodSupport.glsl`（新增）；`Passes/B0_InitSSBOs.comp`、`Passes/C0|D0_ConstructDepth.comp`、`Passes/C8_TAA.frag`（修改）

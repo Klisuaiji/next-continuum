@@ -50,7 +50,14 @@ def expand(path, shader_root, seen=None):
             if m:
                 t = resolve(m.group(1), key, shader_root)
                 if os.path.isfile(t):
-                    out.append(expand(t, shader_root, seen | {key}))
+                    inc = expand(t, shader_root, seen | {key})
+                    # 保留 include 指令行自身的换行：被 include 文件末尾若无换行，
+                    # 用指令行的行尾补齐，避免其最后一行与后续内容粘连（真实预处理器
+                    # 以换行结束指令，Iris glsl-transformer 同样保证该边界）。
+                    nl = '\r\n' if line.endswith('\r\n') else '\n'
+                    if not inc or not inc.endswith(('\n', '\r')):
+                        inc += nl
+                    out.append(inc)
                     continue
             out.append(line)
     return ''.join(out)

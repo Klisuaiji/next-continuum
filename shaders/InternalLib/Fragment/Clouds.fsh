@@ -348,7 +348,7 @@ vec2 CalculateCloudScatteringV2(
     float odSample, int dirLightSteps, float normalizedHeight
 ) {
     float sunVisibility = CalculateCloudSunVisibility(position, vcs, dirLightSteps, true, true);
-    float skyVisibility = CalculateCloudSkyVisibility(position, true);
+    float skyVisibility = CalculateCloudSkyVisibility(position, vcs, true);
 
     float sunLighting = sunVisibility * VC2Powder(odSample, normalizedHeight, VoL) * multiPhase * PI * 2.0;
     float skyLighting = skyVisibility * VC2PhaseG(VoL, 0.0) * PI;
