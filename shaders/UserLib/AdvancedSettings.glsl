@@ -15,14 +15,15 @@
 //            internalLib/ssbo/autoExposureHistogram.glsl
 // Wiring: histogram SSBO (bufferObject.4+) -> luminance stat -> EV, fed to
 //         Camera.fsh ComputeEV(); manual camera mode fully bypasses it.
-// Status: STAGED (compute body pending, needs in-client verification)
+// Status: IMPLEMENTED (bufferObject.4/binding=4 SSBO + A0/A1/A2 compute + C7 feed;
+//         enable via the EXPERIMENTAL screen). Needs in-client verification.
 //#define AUTO_EXPOSURE
 
 // ---------------------------------------------------------------------------
 // M2 - GTAO four-stage pipeline (replaces the plain AO path)
 // Reference: 2.1.3 passes/ambientLighting/ao/GTAO{,BlurX,BlurY,Temporal}.comp
 // Wiring: new AO path kept behind this toggle; old AO kept as fallback.
-// Status: STAGED (compute body pending)
+// Status: BLOCKED by the 16/16 image-slot ceiling (no free 2D target; see review).
 //#define AO_GTAO
 
 // ---------------------------------------------------------------------------
@@ -30,7 +31,7 @@
 // Reference: 2.1.3 createHiZ.comp / genMotionVector.comp /
 //            writeLinearDepths.comp / copyBackGbufferToFront.comp
 // Wiring: feeds HiZ-SSR and LodSupport (DH/Voxy) depth.
-// Status: STAGED (compute body pending)
+// Status: BLOCKED by the 16/16 image-slot ceiling (needs a mipmapped HiZ target).
 //#define HIZ_ACCEL
 
 // ---------------------------------------------------------------------------
@@ -38,7 +39,7 @@
 // Reference: 2.1.3 continuumLib/raytracer/screenSpaceRaytracer.glsl + HiZ
 // Wiring: GPU-driven sorting (RayList/IndirectArgs/bindless) is NOT ported
 //         (Iris has no indirect dispatch); uses HiZ march + fixed dispatch.
-// Status: STAGED (compute body pending)
+// Status: BLOCKED - depends on M3 (HiZ), which needs a free render target.
 //#define HIZ_SSR
 
 // ---------------------------------------------------------------------------
@@ -46,7 +47,7 @@
 // Reference: 2.1.3 precomputedSky.glsl / raymarchSky/* /
 //            passes/camera/genFogHeightDensitiesLut.comp
 // Wiring: couples with clouds / volumetric light / DH fog - implement last.
-// Status: STAGED (compute body pending)
+// Status: BLOCKED by the image/colortex budget (needs a cubemap/LUT target).
 //#define PRECOMPUTED_SKY
 
 // ---------------------------------------------------------------------------
@@ -54,5 +55,6 @@
 // Reference: 2.1.3 continuumLib/aces/* (5 files); helpers already present in
 //            InternalLib/Fragment/ACESSplines.glsl + ACESTransforms.glsl
 // Wiring: activate RRT()/ODT_sRGB_D65() in C7 before the filmic/display path.
-// Status: STAGED (tonemap body pending)
+// Status: IMPLEMENTED (RRT + ODT_sRGB_D65 activated in ACES.glsl, C7 branch;
+//         enable via the EXPERIMENTAL screen). Needs in-client verification.
 //#define FULL_ACES

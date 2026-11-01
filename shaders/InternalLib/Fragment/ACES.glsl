@@ -348,7 +348,7 @@ vec3 FilmToneMap(vec3 LinearColor) {
 /*******************************************************************************
  - ACES Real, slow, never actually use in production.
  ******************************************************************************/
-/*
+#ifdef FULL_ACES   /* M6 - full ACES pipeline (RRT + ODT_sRGB_D65) */
 float cubic_basis_shaper(float x, float w) {
 	//return Square( smoothstep( 0, 1, 1 - abs( 2 * x/w ) ) );
 
@@ -510,4 +510,5 @@ vec3 ACESOutputTransformsRGBD65(vec3 aces) {
 	vec3 OutputReferredLinearsRGBColor =  ODT_sRGB_D65(oces);
 
 	return OutputReferredLinearsRGBColor;
-}*/
+}
+#endif

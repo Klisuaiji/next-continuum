@@ -133,9 +133,18 @@ void main() {
 	vec3 viewVector = viewSpacePosition * normFactor;
 	
 	vec3 currentColor = DecodeColor(DecodeRGBE8(texture2D(colortex2, texcoord)));
-	float currentLum = texture2D(colortex5, texcoord).a * 10000.0;
-
-	float EV = ComputeEV(currentLum); //No touch
+	// M1: GPU histogram auto-exposure overrides the per-pixel luminance when enabled.
+	#ifdef AUTO_EXPOSURE
+		float currentLum = AutoExposureHistogram.adaptedLuminance;
+		#if CAMERA_MODE != CAMERA_MANUAL
+			float EV = AutoExposureHistogram.exposureMultiplier;
+		#else
+			float EV = ComputeEV(currentLum);
+		#endif
+	#else
+		float currentLum = texture2D(colortex5, texcoord).a * 10000.0;
+		float EV = ComputeEV(currentLum); //No touch
+	#endif
 
 	//Calculate Bloom
 	vec3 bloomTiles = CalculateBloom(currentColor, EV);
@@ -167,7 +176,11 @@ void main() {
 		currentColor = vignette(currentColor, texcoord);
 	#endif
 
-	#ifdef TONING_FILMIC
+	// M6: full ACES (RRT + ODT_sRGB_D65) when enabled; filmic / display fallback otherwise.
+	#ifdef FULL_ACES
+		currentColor = ACESOutputTransformsRGBD65(currentColor * sRGB_2_AP0);
+		currentColor = linearToSrgb(currentColor);
+	#elif defined TONING_FILMIC
 		currentColor = (currentColor * 0.5) * sRGB_2_AP0;
 		currentColor = FilmToneMap(currentColor);
 		currentColor = linearToSrgb(currentColor);

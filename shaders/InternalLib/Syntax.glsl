@@ -32,6 +32,16 @@ layout(std430, binding = 2) buffer cloudTransforms {
     mat4 viewMatrixInverse;
 } CloudTransforms;
 
+// M1 - GPU histogram auto-exposure. bufferObject.4 <-> binding 4.
+layout(std430, binding = 4) buffer autoExposureHistogram {
+    int accumulator[128];
+    float normalized[128];
+    float adaptedLuminance;
+    float exposureMultiplier;
+    float exposureLuma;
+    float pad0;
+} AutoExposureHistogram;
+
 layout(std430, binding = 3) buffer sceneData {
     vec3 sunColor;
     vec3 skyColor;
