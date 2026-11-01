@@ -1,15 +1,25 @@
 /* M1 - GPU histogram auto-exposure (stage 1: build the luminance histogram).
  * Port reference: 2.1.3 passes/camera/genHistogram.comp.
- * Center-weighted tent histogram over the HDR scene (colortex2), accumulated
+ * Self-contained (only Syntax.glsl + local helpers, to stay glslang-clean):
+ * center-weighted tent histogram over the HDR scene (colortex2), accumulated
  * through shared memory + atomicAdd into the binding=4 SSBO.
  * Self-gated: compiles to a no-op unless AUTO_EXPOSURE is enabled. */
 layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
 uniform sampler2D colortex2;
-uniform vec2 pixelSize;
+layout(location = 0) uniform vec2 pixelSize;
 
 #include "../InternalLib/Syntax.glsl"
-#include "../InternalLib/Utilities.glsl"
+
+vec3 AutoDecodeRGBE8(vec4 rgbe) {
+    float exponentPart = exp2(rgbe.a * 255.0 - 127.0);
+    vec3  mantissaPart = (510.0 / 256.0) * rgbe.rgb;
+    return exponentPart * mantissaPart;
+}
+
+float AutoRGBToLuma(vec3 rgb) {
+    return dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+}
 
 void main() {
     #ifdef AUTO_EXPOSURE
@@ -28,8 +38,8 @@ void main() {
 
         vec2 uv = (gl_GlobalInvocationID.xy + 0.5) * pixelSize;
         if (uv.x <= 1.0 && uv.y <= 1.0) {
-            vec3 linear = DecodeColor(DecodeRGBE8(texture2D(colortex2, uv)));
-            float lum = clamp(RGBToLuma(linear), MIN_LUM, MAX_LUM);
+            vec3 linear = AutoDecodeRGBE8(texture2D(colortex2, uv)) * 10000.0;
+            float lum = clamp(AutoRGBToLuma(linear), MIN_LUM, MAX_LUM);
             float bin = (log2(lum) - EV_MIN) / EV_SPAN * float(BINS);
 
             float fbin = floor(bin);
