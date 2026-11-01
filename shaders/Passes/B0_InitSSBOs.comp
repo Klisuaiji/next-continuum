@@ -43,21 +43,16 @@ void WriteCameraTransforms() {
     CameraTransforms.viewMatrix = gbufferModelView;
     CameraTransforms.viewMatrixInverse = gbufferModelViewInverse;
 
-    #if defined DISTANT_HORIZONS
-        // DH 通道：直接使用 Iris 提供的合并矩阵，不做透视重建（避免剪切分量丢失）
-        CameraTransforms.nearPlane = combined_near;
-        CameraTransforms.farPlane = combined_far;
-
-        CameraTransforms.projectionMatrix = combined_projection_matrix;
-        CameraTransforms.projectionMatrixInverse = combined_projection_matrix_inverse;
-    #elif defined VOXY
-        // Voxy 通道：维持现状透视重建（已知债，docs/UPSTREAM-DIFF.md）
+    // Keep the main scene camera in vanilla/Iris projection space.
+    // DH has its own projection in the dh_* programs; never replace the
+    // global camera matrix with a guessed or DH-only matrix here.
+    #ifdef VOXY
         CameraTransforms.nearPlane = near;
         CameraTransforms.farPlane = vxRenderDistance * 16.0;
 
         CameraTransforms.projectionMatrix = GenPerspectiveMat(fov, aspectRatio, CameraTransforms.nearPlane, CameraTransforms.farPlane);
         CameraTransforms.projectionMatrixInverse = inverse(CameraTransforms.projectionMatrix);
-    #else 
+    #else
         CameraTransforms.nearPlane = near;
         CameraTransforms.farPlane = far;
 
@@ -88,9 +83,9 @@ void WriteSceneData() {
 
     vec3 viewAbsorb = vec3(1.0);
 
-	SceneData.sunColor = GetSunColorZom() + GetMoonColorZom();
-	SceneData.skyColor = vec3(0.0);
-	SceneData.skyColor = sky_atmosphere(vec3(0.0), upPosition * 0.01, upPosition * 0.01, SceneData.sunVector, SceneData.moonVector, sky_sunColor, sky_moonColor, 10, viewAbsorb);
+    SceneData.sunColor = GetSunColorZom() + GetMoonColorZom();
+    SceneData.skyColor = vec3(0.0);
+    SceneData.skyColor = sky_atmosphere(vec3(0.0), upPosition * 0.01, upPosition * 0.01, SceneData.sunVector, SceneData.moonVector, sky_sunColor, sky_moonColor, 10, viewAbsorb);
 
     SceneData.taaJitter = temporalJitter();
 
