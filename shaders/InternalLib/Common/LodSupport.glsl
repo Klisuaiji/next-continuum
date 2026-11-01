@@ -14,8 +14,6 @@
 uniform float dhNearPlane;
 uniform float dhFarPlane;
 uniform int dhRenderDistance;
-uniform float fov;
-uniform float aspectRatio;
 uniform sampler2D dhDepthTex0;
 uniform sampler2D dhDepthTex1;
 
