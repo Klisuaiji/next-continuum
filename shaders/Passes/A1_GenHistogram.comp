@@ -38,7 +38,7 @@ void main() {
 
         vec2 uv = (gl_GlobalInvocationID.xy + 0.5) * pixelSize;
         if (uv.x <= 1.0 && uv.y <= 1.0) {
-            vec3 linear = AutoDecodeRGBE8(texture2D(colortex2, uv)) * 10000.0;
+            vec3 linear = AutoDecodeRGBE8(texture(colortex2, uv)) * 10000.0;
             float lum = clamp(AutoRGBToLuma(linear), MIN_LUM, MAX_LUM);
             float bin = (log2(lum) - EV_MIN) / EV_SPAN * float(BINS);
 
