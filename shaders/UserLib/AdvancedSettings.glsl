@@ -58,3 +58,16 @@
 // Status: IMPLEMENTED (RRT + ODT_sRGB_D65 activated in ACES.glsl, C7 branch;
 //         enable via the EXPERIMENTAL screen). Needs in-client verification.
 //#define FULL_ACES
+
+// ---------------------------------------------------------------------------
+// M7 - Volumetric Clouds V2 (adaptive stepping + multi-scattering)
+// Reference: 2.1.3 VolumetricSettings.glsl + Clouds.fsh V2 functions
+// Wiring: VOLUMETRIC_CLOUDS_V2 macro in VolumetricSettings.glsl controls
+//         the V2 path in C2_RenderClouds.comp and Clouds.fsh
+// Status: IMPLEMENTED (V2 functions present in Clouds.fsh, C2 wired;
+//         enable via the CLOUDS screen or HIGH/EXTREME profiles)
+// Note: Profile association:
+//   - LOW/MEDIUM: V2 off (fallback to classic clouds)
+//   - HIGH: V2 on (adaptive stepping, single scattering)
+//   - EXTREME: V2 on + multi-scattering (VC2_MULTI_SCATTER defined)
+//#define VOLUMETRIC_CLOUDS_V2

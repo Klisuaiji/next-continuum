@@ -6,14 +6,19 @@
 # shaders/lang/zh_CN.lang（Next Continuum 简体中文，术语表驱动机辅翻译，请配合上游更新校对）
 
 # Profiles
-profile.POTATO=马铃薯
-profile.MINIMUM=最低
+# Phase 1: 压缩为四档配置（LOW / MEDIUM / HIGH / EXTREME）
 profile.LOW=低
 profile.MEDIUM=中
 profile.HIGH=高
-profile.ULTRA=超高
-profile.CINEMATIC=电影级
-profile.comment=电影级档位是个纯粹的"梗"，只为开心时使用！
+profile.EXTREME=极高
+profile.EXTREME.comment=最高质量，启用所有实验性功能
+
+#旧档位（保留参考）
+#profile.POTATO=马铃薯
+#profile.MINIMUM=最低
+#profile.ULTRA=超高
+#profile.CINEMATIC=电影级
+#profile.comment=电影级档位是个纯粹的"梗"，只为开心时使用！
 
 #Screens
 screen.CAMERA=相机设置

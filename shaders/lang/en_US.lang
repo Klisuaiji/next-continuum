@@ -6,14 +6,19 @@
 # shaders/lang/en_US.lang
 
 # Profiles
-profile.POTATO=Potato
-profile.MINIMUM=Minimum
+# Phase 1: Compressed to 4 tiers (LOW / MEDIUM / HIGH / EXTREME)
 profile.LOW=Low
 profile.MEDIUM=Medium
 profile.HIGH=High
-profile.ULTRA=Ultra
-profile.CINEMATIC=Cinematic
-profile.comment=Cinematic is a complete meme, only use it if you want a good time!
+profile.EXTREME=Extreme
+profile.EXTREME.comment=Maximum quality with all experimental features enabled
+
+#Old profiles (archived, keep for reference)
+#profile.POTATO=Potato
+#profile.MINIMUM=Minimum
+#profile.ULTRA=Ultra
+#profile.CINEMATIC=Cinematic
+#profile.comment=Cinematic is a complete meme, only use it if you want a good time!
 
 #Screens
 screen.CAMERA=Camera Settings

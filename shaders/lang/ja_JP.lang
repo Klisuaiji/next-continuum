@@ -6,14 +6,19 @@
 # shaders/lang/ja_JP.lang（日本語、Next Continuum 機械補助翻訳）
 
 # Profiles
-profile.POTATO=ポテト
-profile.MINIMUM=最低
+# Phase 1: 4 つのティアに圧縮（LOW / MEDIUM / HIGH / EXTREME）
 profile.LOW=低
 profile.MEDIUM=中
 profile.HIGH=高
-profile.ULTRA=ウルトラ
-profile.CINEMATIC=シネマティック
-profile.comment=シネマティックは完全なジョークです。楽しむためだけにどうぞ！
+profile.EXTREME=極高
+profile.EXTREME.comment=すべての実験的機能を有効にした最高品質
+
+#旧プロファイル（参考用）
+#profile.POTATO=ポテト
+#profile.MINIMUM=最低
+#profile.ULTRA=ウルトラ
+#profile.CINEMATIC=シネマティック
+#profile.comment=シネマティックは完全なジョークです。楽しむためだけにどうぞ！
 
 #Screens
 screen.CAMERA=カメラ設定

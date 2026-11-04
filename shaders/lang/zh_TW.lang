@@ -6,14 +6,19 @@
 # shaders/lang/zh_TW.lang（繁體中文，由簡體自動轉換）
 
 # Profiles
-profile.POTATO=馬鈴薯
-profile.MINIMUM=最低
+# Phase 1: 壓縮為四檔配置（LOW / MEDIUM / HIGH / EXTREME）
 profile.LOW=低
 profile.MEDIUM=中
 profile.HIGH=高
-profile.ULTRA=超高
-profile.CINEMATIC=電影級
-profile.comment=電影級檔位是個純粹的"梗"，只為開心時使用！
+profile.EXTREME=極高
+profile.EXTREME.comment=最高質量，啟用所有實驗性功能
+
+#舊檔位（保留參考）
+#profile.POTATO=馬鈴薯
+#profile.MINIMUM=最低
+#profile.ULTRA=超高
+#profile.CINEMATIC=電影級
+#profile.comment=電影級檔位是個純粹的"梗"，只為開心時使用！
 
 #Screens
 screen.CAMERA=相機設定

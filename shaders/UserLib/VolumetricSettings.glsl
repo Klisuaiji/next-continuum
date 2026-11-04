@@ -48,16 +48,31 @@
 
 // --- 2.1.3 新体云增强（VOLUMETRIC_CLOUDS_V2）：自适应非线性步长 + 多重散射 + 改进 powder。
 // 默认关：取消下一行注释即在 [CLOUDS] 菜单开启；关闭时完全走旧体云，零回归。
-//#define VOLUMETRIC_CLOUDS_V2
-#define VC2_MULTISCAT_TERMS 4 // [2 3 4 5 6]
-#define VC2_MULTISCAT_G_DECAY 0.5
-#define VC2_MULTISCAT_ENERGY 0.5
-#define VC2_FORWARD_G 0.8
-#define VC2_BACKWARD_G -0.5
-#define VC2_MIX_G 0.5
-#define VC2_STEP_POWER 2.0 // [1.5 2.0 2.5 3.0]
-#define VOLUMETRIC_CLOUDS_SHADOWS
-#define CLOUD_SHADOWMAP_RADIUS 2048
+// Phase 1: 添加 V2 核心常量（8 个）
+#define VOLUMETRIC_CLOUDS_V2
+#ifdef VOLUMETRIC_CLOUDS_V2
+    // V2 核心常量
+    #define VC2_ADAPTIVE_STEP 0.5           // 自适应步长系数（0-1，越小越精细）
+    #define VC2_MULTI_SCATTER true          // 启用多重散射（HIGH/EXTREME 档开启）
+    #define VC2_HG_PHASE_G 0.6              // HG 相位函数 g 参数（0-1，推荐 0.5-0.7）
+    #define VC2_POWDER_STRENGTH 0.8         // powder 效果强度
+    #define VC2_RAY_STEP_COUNT VOLUMETRIC_CLOUDS_QUALITY // 光线步数（复用 VC_* 常量）
+    #define VC2_SHADOW_STEP 16              // 阴影步数（建议 12-24）
+    #define VC2_CLOUD_SCALE VOLUMETRIC_CLOUDS_SCALE // 云层缩放（复用现有常量）
+    #define VC2_CLOUD_HEIGHT VOLUMETRIC_CLOUDS_ALTITUDE // 云层基础高度（复用现有常量）
+    
+    // 多重散射参数（仅 EXTREME 档启用）
+    #define VC2_MULTISCAT_TERMS 4 // [2 3 4 5 6] 多重散射项数
+    #define VC2_MULTISCAT_G_DECAY 0.5 // g 衰减系数
+    #define VC2_MULTISCAT_ENERGY 0.5 // 能量保持
+    #define VC2_FORWARD_G 0.8 // 前向散射 g
+    #define VC2_BACKWARD_G -0.5 // 后向散射 g
+    #define VC2_MIX_G 0.5 // g 混合系数
+    #define VC2_STEP_POWER 2.0 // [1.5 2.0 2.5 3.0] 步长幂次
+    
+    #define VOLUMETRIC_CLOUDS_SHADOWS
+    #define CLOUD_SHADOWMAP_RADIUS 2048
+#endif
 
 #ifdef VOLUMETRIC_CLOUDS_SHADOWS 
 #endif
