@@ -13,6 +13,22 @@ profile.HIGH=高
 profile.EXTREME=極高
 profile.EXTREME.comment=すべての実験的機能を有効にした最高品質
 
+# Phase 2: ビジュアルスタイル設定
+profile.VISUAL_STYLE_NATURAL=ナチュラル
+profile.VISUAL_STYLE_VIVID=ビビッド
+profile.VISUAL_STYLE_CINEMATIC=シネマティック
+profile.VISUAL_STYLE_MOODY=ムーディ
+profile.VISUAL_STYLE_NORDIC=ノーディック
+profile.VISUAL_STYLE_NEUTRAL=ニュートラル
+
+# Phase 2: 水体プリセット設定
+profile.WATER_PRESET_NATURAL=ナチュラル
+profile.WATER_PRESET_CLEAR=クリア
+profile.WATER_PRESET_DEEP=ディープ
+profile.WATER_PRESET_TURQUOISE=ターコイズ
+profile.WATER_PRESET_MURKY=マーキー
+profile.WATER_PRESET_CUSTOM=カスタム
+
 #旧プロファイル（参考用）
 #profile.POTATO=ポテト
 #profile.MINIMUM=最低
@@ -71,8 +87,37 @@ value.CAMERA_MODE.CAMERA_AUTO=自動
 value.CAMERA_MODE.CAMERA_MANUAL=手動
 
 option.INFO=Continuum 2.0 Redux
+option.INFO.comment=Continuum 2.0 Redux - Phase 2 カラーマネジメント
 value.INFO.0=by uvraj
 value.INFO.1=by uvraj
+
+# Phase 2: ビジュアルスタイルと水体プリセットオプション
+option.VISUAL_STYLE=ビジュアルスタイル
+option.VISUAL_STYLE.comment=彩度、コントラスト、色調、ムードを制御するカラーグレーディングプリセット。パフォーマンス設定とは独立しています。
+value.VISUAL_STYLE.0=ナチュラル
+value.VISUAL_STYLE.1=ビビッド
+value.VISUAL_STYLE.2=シネマティック
+value.VISUAL_STYLE.3=ムーディ
+value.VISUAL_STYLE.4=ノーディック
+value.VISUAL_STYLE.5=ニュートラル
+
+option.WATER_PRESET=水体プリセット
+option.WATER_PRESET.comment=吸収、散乱、波の高さ、泡を含む水体の光学特性。ビジュアルスタイルとは独立しています。
+value.WATER_PRESET.0=ナチュラル
+value.WATER_PRESET.1=クリア
+value.WATER_PRESET.2=ディープ
+value.WATER_PRESET.3=ターコイズ
+value.WATER_PRESET.4=マーキー
+value.WATER_PRESET.5=カスタム
+
+# Phase 2: レガシークイックフィルター（後方互換）
+option.QUICK_FILTER=クイックフィルター（旧版）
+option.QUICK_FILTER.comment=旧版クイックフィルター。新しい設定ではビジュアルスタイルと水体プリセットを個別に使用してください。
+value.QUICK_FILTER.0=ナチュラル
+value.QUICK_FILTER.1=ビビッド
+value.QUICK_FILTER.2=シネマティック
+value.QUICK_FILTER.3=ムーディ
+value.QUICK_FILTER.4=クリアウォーター
 
 option.CAMERA_MODE=カメラモード
 option.CAMERA_MODE.comment=自動はゲーム向けにカメラが自動調整します。手動はスクリーンショットや映像向けです。

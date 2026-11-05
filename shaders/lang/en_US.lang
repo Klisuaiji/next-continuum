@@ -13,6 +13,22 @@ profile.HIGH=High
 profile.EXTREME=Extreme
 profile.EXTREME.comment=Maximum quality with all experimental features enabled
 
+# Phase 2: Visual Style Profiles
+profile.VISUAL_STYLE_NATURAL=Natural
+profile.VISUAL_STYLE_VIVID=Vivid
+profile.VISUAL_STYLE_CINEMATIC=Cinematic
+profile.VISUAL_STYLE_MOODY=Moody
+profile.VISUAL_STYLE_NORDIC=Nordic
+profile.VISUAL_STYLE_NEUTRAL=Neutral
+
+# Phase 2: Water Preset Profiles
+profile.WATER_PRESET_NATURAL=Natural
+profile.WATER_PRESET_CLEAR=Clear
+profile.WATER_PRESET_DEEP=Deep
+profile.WATER_PRESET_TURQUOISE=Turquoise
+profile.WATER_PRESET_MURKY=Murky
+profile.WATER_PRESET_CUSTOM=Custom
+
 #Old profiles (archived, keep for reference)
 #profile.POTATO=Potato
 #profile.MINIMUM=Minimum
@@ -71,8 +87,37 @@ value.CAMERA_MODE.CAMERA_AUTO=Auto
 value.CAMERA_MODE.CAMERA_MANUAL=Manual
 
 option.INFO=Continuum 2.0 Redux
+option.INFO.comment=Continuum 2.0 Redux - Phase 2 Color Management
 value.INFO.0=by uvraj
 value.INFO.1=by uvraj
+
+# Phase 2: Visual Style and Water Preset Options
+option.VISUAL_STYLE=Visual Style
+option.VISUAL_STYLE.comment=Color grading presets that control saturation, contrast, tint, and mood. Independent from performance settings.
+value.VISUAL_STYLE.0=Natural
+value.VISUAL_STYLE.1=Vivid
+value.VISUAL_STYLE.2=Cinematic
+value.VISUAL_STYLE.3=Moody
+value.VISUAL_STYLE.4=Nordic
+value.VISUAL_STYLE.5=Neutral
+
+option.WATER_PRESET=Water Preset
+option.WATER_PRESET.comment=Water optical properties including absorption, scattering, wave height, and foam. Independent from visual style.
+value.WATER_PRESET.0=Natural
+value.WATER_PRESET.1=Clear
+value.WATER_PRESET.2=Deep
+value.WATER_PRESET.3=Turquoise
+value.WATER_PRESET.4=Murky
+value.WATER_PRESET.5=Custom
+
+# Phase 2: Legacy Quick Filter (Backward Compatibility)
+option.QUICK_FILTER=Quick Filter (Legacy)
+option.QUICK_FILTER.comment=Legacy quick filter. For new configs, use Visual Style and Water Preset separately.
+value.QUICK_FILTER.0=Natural
+value.QUICK_FILTER.1=Vivid
+value.QUICK_FILTER.2=Cinematic
+value.QUICK_FILTER.3=Moody
+value.QUICK_FILTER.4=Clear Water
 
 option.CAMERA_MODE=Camera Mode
 option.CAMERA_MODE.comment=Operating mode of the camera. 'Auto' is best for gameplay, where the camera will adjust itself. 'Manual' is best for screenshots and cinematics, where precise control over the camera is necessary.

@@ -1,9 +1,14 @@
 /*******************************************************************************
- - Quick Filter Settings
+ - Quick Filter Settings (Phase 2 - Backward Compatibility Layer)
    One-click look presets that bundle water-wave and lighting effects.
-   Set QUICK_FILTER to any preset to instantly change the look without
-   touching the individual sliders. NATURAL reduces every effective value
-   back to the matching slider value, so the pack behaves exactly as before.
+   
+   PHASE 2 UPDATE: Quick Filter functionality has been split into:
+   - Visual Style Settings (VisualStyleSettings.glsl): Color grading presets
+   - Water Preset Settings (WaterPresetSettings.glsl): Water optical properties
+   
+   For backward compatibility, setting QUICK_FILTER will automatically map
+   to the corresponding VISUAL_STYLE. New configs should use the new system.
+   
    Reference implementation: Continuum 2.1.3 style quick presets (自研重写).
  ******************************************************************************/
 
@@ -14,6 +19,17 @@
 #define QUICK_FILTER_CLEAR_WATER 4
 
 #define QUICK_FILTER QUICK_FILTER_NATURAL // [QUICK_FILTER_NATURAL QUICK_FILTER_VIVID QUICK_FILTER_CINEMATIC QUICK_FILTER_MOODY QUICK_FILTER_CLEAR_WATER]
+
+// ============================================================================
+// Backward Compatibility: Map QUICK_FILTER to VISUAL_STYLE
+// ============================================================================
+// If QUICK_FILTER is set to non-NATURAL, enable compat mode and map to
+// the corresponding VISUAL_STYLE preset. WATER_PRESET remains independent.
+
+#if QUICK_FILTER != QUICK_FILTER_NATURAL
+    #define QUICK_FILTER_COMPAT_MODE
+    #define LEGACY_WATER_MODE
+#endif
 
 // --- Effective water-wave parameters (preset-adjusted) ---
 //  These expand to WATER_SPEED_MULT / WAVE_HEIGHT_MULT (injected globally by
