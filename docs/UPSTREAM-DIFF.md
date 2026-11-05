@@ -8,6 +8,42 @@
 - `shaders/` 全部文件：**零修改**（静态核验通过，见 docs/legacy 移植报告 §3-4）。
 - 新增：`pack.mcmeta`、`移植说明.md`、`Continuum-Redux-Iris1.21.1-移植报告.md`、`README.md`、`LICENSE`（保留原件）。
 
+## Phase 3（功能增强线，2026-11-04 起）
+
+### S0 Phase 1 功能移植（提交 0ac2bba）
+
+**目标：** 从 Continuum 2.1.3 向下移植高价值功能到 2.0 base
+
+| 文件 | 类型 | 说明 | rebase 难度 |
+|---|---|---|---|
+| `shaders/shaders.properties` | 修改 | 7 档性能配置压缩为 4 档（LOW/MEDIUM/HIGH/EXTREME），关联 V2/HiZ/ temporal 开关 | 低（仅配置变更） |
+| `shaders/UserLib/QuickFilterSettings.glsl` | 修改 | 5 档快速滤镜预设（NATURAL/VIVID/CINEMATIC/MOODY/CLEAR_WATER） | 低（纯新增预设） |
+| `shaders/UserLib/VolumetricSettings.glsl` | 修改 | VOLUMETRIC_CLOUDS_V2 开关 + 8 核心常量 + 多重散射参数 | 低（宏门控隔离） |
+| `shaders/UserLib/AdvancedSettings.glsl` | 修改 | 新增 M7 VOLUMETRIC_CLOUDS_V2 开关说明 | 无（纯注释） |
+| `shaders/lang/*.lang` (4 文件) | 修改 | profile 档位翻译更新（移除 POTATO/MINIMUM/ULTRA/CINEMATIC，新增 EXTREME） | 无（纯本地化） |
+| `docs/CONTINUUM-2.1-TO-2.0-PORT-ANALYSIS.md` | 新增 | 2.1.3→2.0 向下移植分析报告（683 行） | 无（纯文档） |
+| `docs/PHASE1-IMPLEMENTATION-REPORT.md` | 新增 | Phase 1 实施报告（414 行，含实机验证清单） | 无（纯文档） |
+
+**核心变更：**
+1. **性能档位**: 7 档→4 档，简化用户选择
+2. **体积云 V2**: 自适应步长 + 多重散射（HIGH/EXTREME 档启用）
+3. **快速滤镜**: 5 档视觉预设，与性能档位独立
+4. **自动曝光**: 直方图 pipeline（待实机验证）
+5. **ACES**: 完整 RRT+ODT（待实机验证）
+
+**rebase 策略：**
+- V2 相关修改通过 `#ifdef VOLUMETRIC_CLOUDS_V2` 隔离，上游更新时可保留
+- 快速滤镜为独立文件，rebase 时直接保留
+- 性能档位配置需随上游更新重新校准采样数
+
+**待办：**
+- [ ] 实机验证自动曝光效果
+- [ ] 测试四档配置 FPS 表现
+- [ ] 校准 V2 云层参数
+- [ ] 实现 EXTREME 档 HiZ SSR 和时间帧复用
+
+---
+
 ## Phase 2（LOD 支持线，进行中）
 
 ### S0 工程化基线（本次提交，`shaders/` 仍零修改）
