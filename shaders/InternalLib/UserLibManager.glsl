@@ -13,3 +13,5 @@
 #include "/UserLib/SkySettings.glsl"
 #include "/UserLib/VolumetricSettings.glsl"
 #include "/UserLib/WaterSettings.glsl"
+#include "/UserLib/QuickFilterSettings.glsl"
+#include "/UserLib/AdvancedSettings.glsl"  // Phase 1: 高级功能开关（M1-M7）
