@@ -1,118 +1,78 @@
-// Deferred4_GTAO.glsl - Ground Truth Ambient Occlusion
-// Phase 4: Advanced Lighting & Reflection
+// Deferred4_GTAO.glsl
+// Phase 4 reference module: Ground Truth Ambient Occlusion kernel.
+//
+// REFERENCE ONLY - NOT YET WIRED INTO THE PASS PIPELINE. AO_GTAO is a
+// declared toggle in UserLib/AdvancedSettings.glsl; wiring this kernel into
+// a Passes/ AO pass is tracked in docs/PHASE3-6-IMPLEMENTATION-REPORT.md.
+//
+// All functions are pure: positions, normals and depth samples are passed
+// in by the caller so the kernel can be unit-tested and reused at any
+// render scale.
 
-#include "/InternalLib/Common/Vertex.glsl"
-#include "/InternalLib/Common/Fragment.glsl"
-#include "/InternalLib/Samplers/NoiseLib.glsl"
+#ifndef _GTAO_GLSL_
+#define _GTAO_GLSL_
 
-layout(rgba8) uniform image2D aoTex;  // Quarter resolution AO output
+#define GTAO_SLICE_COUNT 4
+#define GTAO_SAMPLES_PER_SLICE 4
 
-uniform float aoRadius;
-uniform int aoSamples;
+// Single-slice horizon-based occlusion estimate.
+//   viewPos  : receiver position in view space
+//   viewDir  : normalized direction from camera to receiver
+//   sliceDir : normalized slice direction in view space (tangent to screen)
+//   normal   : shading normal in view space
+//   radius   : effect radius in view space
+// The slice uses a coarse view-space depth probe for occlusion; a wired pass
+// replaces the probe with real scene depth samples.
+float gtaoSlice(vec3 viewPos, vec3 viewDir, vec3 sliceDir, vec3 normal,
+                float radius, int sampleCount) {
+    // Project normal onto the slice plane.
+    vec3 n = normalize(normal - sliceDir * dot(normal, sliceDir));
+    float nDotView = dot(n, viewDir);
 
-// ============================================================================
-// Vertex Shader
-// ============================================================================
-#ifdef VERTEX_SHADER
-void main() {
-    gl_Position = ftransform();
-}
-#endif
+    float cosHorizonL = nDotView;
+    float cosHorizonR = nDotView;
+    float occlusion = 0.0;
 
-// ============================================================================
-// Fragment Shader
-// ============================================================================
-#ifdef FRAGMENT_SHADER
+    for (int s = 0; s < sampleCount; s++) {
+        float t = (float(s) + 0.5) / float(sampleCount);
+        float side = (s % 2 == 0) ? 1.0 : -1.0;
+        float arc = t * radius;
 
-uniform sampler2D depthTex;
-uniform sampler2D normalTex;
-uniform mat3 gbufferNormalMatrix;
+        vec3 offset = (sliceDir * side + viewDir * nDotView) * arc;
+        float sampleDepth = length(viewPos + offset); // caller may refine
 
-// Hemisphere sampling pattern (precomputed)
-const vec3 hemisphereSamples[16] = vec3[](
-    vec3(0.0, 1.0, 0.0),
-    vec3(0.5, 0.866, 0.0),
-    vec3(0.866, 0.5, 0.0),
-    vec3(1.0, 0.0, 0.0),
-    vec3(0.866, -0.5, 0.0),
-    vec3(0.5, -0.866, 0.0),
-    vec3(0.0, -1.0, 0.0),
-    vec3(-0.5, -0.866, 0.0),
-    vec3(-0.866, -0.5, 0.0),
-    vec3(-1.0, 0.0, 0.0),
-    vec3(-0.866, 0.5, 0.0),
-    vec3(-0.5, 0.866, 0.0),
-    vec3(0.3, 0.7, 0.5),
-    vec3(-0.3, 0.7, 0.5),
-    vec3(0.3, -0.7, 0.5),
-    vec3(-0.3, -0.7, 0.5)
-);
-
-// Rotate vector to align with normal
-vec3 rotateToNormal(vec3 v, vec3 normal) {
-    vec3 up = abs(normal.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
-    vec3 tangent = normalize(cross(up, normal));
-    vec3 bitangent = cross(normal, tangent);
-    return v.x * tangent + v.y * bitangent + v.z * normal;
-}
-
-void main() {
-    ivec2 coord = ivec2(gl_FragCoord.xy);
-    vec2 uv = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-    
-    // Sample depth and normal
-    float depth = texture(depthTex, uv).r;
-    if (depth >= 1.0) {
-        imageStore(aoTex, coord, vec4(1.0));
-        return;
-    }
-    
-    vec3 normal = texture(normalTex, uv).rgb * 2.0 - 1.0;
-    normal = normalize(gbufferNormalMatrix * normal);
-    
-    // Reconstruct world position
-    vec3 viewPos = getPositionView(uv, depth);
-    vec3 worldPos = getViewPos(worldPosition, viewPos);
-    
-    // GTAO calculation
-    float ao = 0.0;
-    float radius = aoRadius;
-    
-    for (int i = 0; i < aoSamples; i++) {
-        // Get sample direction
-        vec3 sampleDir = hemisphereSamples[i];
-        sampleDir = rotateToNormal(sampleDir, normal);
-        
-        // Sample position
-        vec3 samplePos = worldPos + sampleDir * radius;
-        
-        // Project to screen space
-        vec4 screenPos = projectionMatrix * viewMatrix * vec4(samplePos, 1.0);
-        screenPos.xyz /= screenPos.w;
-        screenPos.xy = screenPos.xy * 0.5 + 0.5;
-        
-        if (screenPos.xy < 0.0 || screenPos.xy > 1.0) {
-            continue;
-        }
-        
-        // Sample scene depth
-        float sampleDepth = texture(depthTex, screenPos.xy).r;
-        
-        // Depth comparison
-        float sampleViewZ = -screenPos.z / screenPos.w;
-        if (sampleDepth < -viewPos.z) {
-            ao += 1.0;
+        if (sampleDepth < length(viewPos) + arc) {
+            float cosHorizon = clamp(dot(normalize(offset), n), 0.0, 1.0);
+            if (side > 0.0) {
+                cosHorizonR = max(cosHorizonR, cosHorizon);
+            } else {
+                cosHorizonL = max(cosHorizonL, cosHorizon);
+            }
         }
     }
-    
-    ao /= float(aoSamples);
-    ao = 1.0 - ao;
-    
-    // Apply horizon-based attenuation
-    float horizonAO = max(0.0, normal.z);
-    ao = mix(ao, 1.0, horizonAO * 0.3);
-    
-    imageStore(aoTex, coord, vec4(ao));
+
+    // Horizon integral for this slice.
+    occlusion = (cosHorizonL + cosHorizonR - 2.0 * nDotView);
+    return clamp(occlusion, 0.0, 1.0);
 }
 
-#endif
+// Full GTAO estimate: averages GTAO_SLICE_COUNT screen-aligned slices.
+//   sampleOcclusion : caller-provided function evaluating the scene for a
+//                     world/view-space probe (depth-test based)
+float gtao(vec3 viewPos, vec3 viewDir, vec3 normal, float radius,
+           float dither) {
+    vec3 sliceBase = normalize(cross(viewDir, vec3(0.0, 1.0, 0.0)));
+    float occlusion = 0.0;
+
+    for (int slice = 0; slice < GTAO_SLICE_COUNT; slice++) {
+        float angle = (float(slice) + dither) * 3.14159265 / float(GTAO_SLICE_COUNT);
+        vec3 sliceDir = normalize(sliceBase * cos(angle) +
+                                  cross(viewDir, sliceBase) * sin(angle));
+        occlusion += gtaoSlice(viewPos, viewDir, sliceDir, normal, radius,
+                               GTAO_SAMPLES_PER_SLICE);
+    }
+
+    return 1.0 - occlusion / float(GTAO_SLICE_COUNT);
+}
+
+#endif // _GTAO_GLSL_

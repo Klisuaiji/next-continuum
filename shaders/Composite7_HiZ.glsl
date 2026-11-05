@@ -1,89 +1,64 @@
-// Composite7_HiZ.glsl - Hierarchical Z-Buffer Generation
-// Phase 4: Advanced Lighting & Reflection
+// Composite7_HiZ.glsl
+// Phase 4 reference module: Hierarchical-Z (HiZ) acceleration for SSR.
+//
+// REFERENCE ONLY - NOT YET WIRED INTO THE PASS PIPELINE. The live pass
+// programs live in Passes/ and are fused by the build scripts; this module
+// provides the algorithms for a future Passes/HiZ pass and for integrating
+// HiZ-accelerated ray marching into the specular pass.
+//
+// Integration prerequisites (tracked in docs/PHASE3-6-IMPLEMENTATION-REPORT.md):
+//   - one free image slot or a colortex target for the pyramid
+//   - a compute pass to build the pyramid after depth construction
+//   - hooking hiZMarch into the specular ray march
 
-#include "/InternalLib/Common/Vertex.glsl"
-#include "/InternalLib/Common/Fragment.glsl"
+#ifndef _HIZ_GLSL_
+#define _HIZ_GLSL_
 
-layout(r32f) uniform image2D hizTex;  // 1024x1024, stores mip levels
+#define HIZ_MAX_MIP_LEVELS 10
 
-// ============================================================================
-// Vertex Shader
-// ============================================================================
-#ifdef VERTEX_SHADER
-void main() {
-    gl_Position = ftransform();
-}
-#endif
-
-// ============================================================================
-// Fragment Shader
-// ============================================================================
-#ifdef FRAGMENT_SHADER
-
-uniform sampler2D depthTex;  // Full resolution depth buffer
-
-// Generate HiZ pyramid
-// Each mip level stores the maximum depth of 4 samples from previous level
-void main() {
-    ivec2 coord = ivec2(gl_FragCoord.xy);
-    
-    // Base level (mip 0): Sample from full-res depth
-    if (coord.x < 512 && coord.y < 512) {
-        float d0 = texture(depthTex, (vec2(coord * 2) + vec2(0, 0)) / vec2(viewWidth, viewHeight)).r;
-        float d1 = texture(depthTex, (vec2(coord * 2) + vec2(1, 0)) / vec2(viewWidth, viewHeight)).r;
-        float d2 = texture(depthTex, (vec2(coord * 2) + vec2(0, 1)) / vec2(viewWidth, viewHeight)).r;
-        float d3 = texture(depthTex, (vec2(coord * 2) + vec2(1, 1)) / vec2(viewWidth, viewHeight)).r;
-        
-        float maxDepth = max(max(d0, d1), max(d2, d3));
-        imageStore(hizTex, coord, vec4(maxDepth));
-    }
-    
-    // Higher mip levels are generated in subsequent passes
-    // This is a simplified single-pass version
-    // For full implementation, use 10 passes or compute shader
+// Reduce a 2x2 quad of linear depths to the conservative max (nearest occluder).
+float hiZReduceQuad(float d0, float d1, float d2, float d3) {
+    return max(max(d0, d1), max(d2, d3));
 }
 
-// ============================================================================
-// HiZ Ray March Function (to be included in SSR shader)
-// ============================================================================
-/*
-vec3 hiZMarch(vec3 origin, vec3 dir, float maxDistance) {
-    const int maxSteps = 64;
-    const int maxMipLevels = 10;
-    
-    vec3 currentPos = origin;
-    float mipLevel = float(maxMipLevels);
-    float stepSize = maxDistance / float(maxSteps);
-    
+// Screen-space march against a HiZ pyramid stored in a single texture whose
+// mip levels hold the per-level maximum depth.
+//   hizSampler : pyramid texture (mip 0 = full-res max-reduced depth)
+//   rayOrigin  : screen-space xyz, xy in [0,1], z = linear depth
+//   rayDir     : screen-space direction (pre-divided by projected w)
+// Returns the hit uv in .xy and the hit linear depth in .z; z < 0.0 on miss.
+vec3 hiZMarch(sampler2D hizSampler, vec3 rayOrigin, vec3 rayDir, int maxSteps) {
+    vec3 pos = rayOrigin;
+    float mip = float(HIZ_MAX_MIP_LEVELS - 1);
+
     for (int i = 0; i < maxSteps; i++) {
-        // Project to screen space
-        vec4 screenPos = projectionMatrix * viewMatrix * vec4(currentPos, 1.0);
-        screenPos.xyz /= screenPos.w;
-        screenPos.xy = screenPos.xy * 0.5 + 0.5;
-        
-        if (screenPos.xy < 0.0 || screenPos.xy > 1.0) {
-            break;
-        }
-        
-        // Sample HiZ at current mip level
-        float hizDepth = texture(hizTex, screenPos.xy, mipLevel).r;
-        
-        if (currentPos.z < hizDepth) {
-            // Hit: refine step
-            mipLevel = max(0.0, mipLevel - 1.0);
-            stepSize *= 0.5;
+        vec2 mipSize = vec2(textureSize(hizSampler, 0));
+        float levelSize = exp2(-mip);
+
+        // Advance one cell of the current mip level.
+        vec2 cellSize = levelSize / mipSize;
+        vec3 delta = rayDir / max(abs(rayDir.z), 1e-6);
+        vec3 nextCross = pos + delta * cellSize.y * sign(rayDir.z);
+
+        float cellDepth = texelFetch(hizSampler, ivec2(pos.xy * mipSize), int(mip)).r;
+
+        if (nextCross.z > cellDepth) {
+            // Ray passes behind the occluder bound of this cell: refine.
+            if (mip <= 0.0) {
+                return vec3(pos.xy, pos.z);
+            }
+            mip -= 1.0;
         } else {
-            // Miss: continue marching
-            currentPos += dir * stepSize;
+            pos = nextCross;
+            mip = min(float(HIZ_MAX_MIP_LEVELS - 1), mip + 1.0);
         }
-        
-        if (mipLevel <= 0.0 && stepSize < 0.001) {
+
+        if (any(lessThan(pos.xy, vec2(0.0))) || any(greaterThan(pos.xy, vec2(1.0)))) {
             break;
         }
     }
-    
-    return currentPos;
-}
-*/
 
-#endif
+    return vec3(pos.xy, -1.0);
+}
+
+#endif // _HIZ_GLSL_

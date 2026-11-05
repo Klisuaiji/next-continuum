@@ -1,222 +1,59 @@
-// InternalLib/Utilities/Materials.glsl
-#ifndef MATERIAL_SYSTEM
-#define MATERIAL_SYSTEM
+#if !defined _MATERIALS_GLSL_
+#define _MATERIALS_GLSL_
 
-#include "/UserLib/LightingSettings.glsl"
+#define IsVeg(materialID) (materialID == 18 || materialID == 31 || materialID == 175 || materialID == 176)
+#define IsWater(materialID) (materialID == 8 || materialID == 9)
+#define IsEmitter(materialID) (materialID >= 32 && materialID <= 160)
+#define IsNetherPortal(materialID) (materialID == 35)
+#define IsLightningBolt(materialID) (materialID == 43)
+#define IsStainedGlass(materialID) (materialID == 44)
+#define IsHand(materialID) (materialID == 178)
 
-// ============================================================================
-// labPBR Texture Format Definitions
-// ============================================================================
-#define TEXTURE_FORMAT_LAB     1  // Full labPBR 1.3+
-#define TEXTURE_FORMAT_OLD     2  // Legacy labPBR
-#define TEXTURE_FORMAT_VANILLA 0  // No PBR textures
+vec4 GetLightColor(int blockID) {
+	vec3 lightColor = vec3(0.0);
+    float attenuation = 1.0; // 1.0 indicates the voxel is occupied.
 
-#ifndef TEXTURE_FORMAT
-    #define TEXTURE_FORMAT TEXTURE_FORMAT_LAB
-#endif
-
-// ============================================================================
-// Material Structure
-// ============================================================================
-struct Material {
-    vec3 albedo;
-    vec3 normal;
-    float roughness;
-    float metallic;
-    float specular;
-    vec3 emission;
-    float subsurface;
-    float porosity;
-    float thickness;
-};
-
-// ============================================================================
-// Material ID Constants (for fallback materials)
-// ============================================================================
-#define MAT_STONE       0
-#define MAT_WOOD        1
-#define MAT_METAL       2
-#define MAT_GLASS       3
-#define MAT_WATER       4
-#define MAT_LEAF        5
-#define MAT_SKIN        6
-#define MAT_FABRIC      7
-#define MAT_EMISSIVE    8
-
-// ============================================================================
-// Read Specular Map (labPBR format)
-// ============================================================================
-vec4 readSpecularMap(sampler2D specularMap, vec2 uv) {
-    #if TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
-        // Full labPBR 1.3+: R=roughness, G=metallic, B=specular, A=emission
-        return texture(specularMap, uv);
-        
-    #elif TEXTURE_FORMAT == TEXTURE_FORMAT_OLD
-        // Legacy labPBR: R=roughness, G=metallic, B=emission
-        vec4 s = texture(specularMap, uv);
-        return vec4(s.r, s.g, 0.02, s.b);
-        
-    #else
-        // Vanilla: default values
-        return vec4(0.5, 0.0, 0.02, 0.0);
-    #endif
-}
-
-// ============================================================================
-// Read Normal Map with Tangent Space Transformation
-// ============================================================================
-vec3 readNormalMap(sampler2D normalMap, vec2 uv, vec3 tangent, vec3 bitangent, vec3 normal) {
-    #ifdef USE_NORMAL_MAPPING
-        vec3 n = texture(normalMap, uv).rgb * 2.0 - 1.0;
-        n.z += 0.001; // Prevent division by zero
-        n = normalize(n);
-        
-        // Transform from tangent space to world space
-        mat3 tbn = mat3(normalize(tangent), normalize(bitangent), normalize(normal));
-        return normalize(tbn * n);
-    #else
-        return normalize(normal);
-    #endif
-}
-
-// ============================================================================
-// Fallback Material (when no labPBR textures available)
-// ============================================================================
-Material getFallbackMaterial(int materialID) {
-    Material mat;
-    mat.albedo = vec3(1.0);
-    mat.normal = vec3(0.0, 0.0, 1.0);
-    mat.subsurface = 0.0;
-    mat.porosity = 0.5;
-    mat.thickness = 1.0;
-    mat.emission = vec3(0.0);
-    
-    switch (materialID) {
-        case MAT_STONE:
-            mat.roughness = 0.7;
-            mat.metallic = 0.0;
-            mat.specular = 0.02;
-            break;
-            
-        case MAT_WOOD:
-            mat.roughness = 0.6;
-            mat.metallic = 0.0;
-            mat.specular = 0.03;
-            mat.subsurface = 0.1;
-            break;
-            
-        case MAT_METAL:
-            mat.roughness = 0.3;
-            mat.metallic = 1.0;
-            mat.specular = 0.8;
-            break;
-            
-        case MAT_GLASS:
-            mat.roughness = 0.1;
-            mat.metallic = 0.0;
-            mat.specular = 0.04;
-            break;
-            
-        case MAT_WATER:
-            mat.roughness = 0.2;
-            mat.metallic = 0.0;
-            mat.specular = 0.02;
-            break;
-            
-        case MAT_LEAF:
-            mat.roughness = 0.8;
-            mat.metallic = 0.0;
-            mat.specular = 0.01;
-            mat.subsurface = 0.5;
-            break;
-            
-        case MAT_SKIN:
-            mat.roughness = 0.4;
-            mat.metallic = 0.0;
-            mat.specular = 0.03;
-            mat.subsurface = 0.8;
-            break;
-            
-        case MAT_FABRIC:
-            mat.roughness = 0.9;
-            mat.metallic = 0.0;
-            mat.specular = 0.01;
-            break;
-            
-        case MAT_EMISSIVE:
-            mat.roughness = 0.5;
-            mat.metallic = 0.0;
-            mat.specular = 0.02;
-            mat.emission = vec3(1.0);
-            break;
-            
-        default:
-            mat.roughness = 0.5;
-            mat.metallic = 0.0;
-            mat.specular = 0.02;
-            break;
+    switch (blockID) {
+        case 36: lightColor = normalize(blackbody(6500));          break;
+        case 10: lightColor = vec3(1.00, 0.25, 0.00);   break;
+        case 11: lightColor = vec3(1.00, 0.25, 0.00);   break;
+        case 33: lightColor = normalize(blackbody(1000));   break;
+        case 38: lightColor = vec3(1.00, 0.02, 0.02);   break;
+        case 34: lightColor = vec3(0.00, 0.25, 1.00);   break;
+        case 35: lightColor = vec3(0.5, 0.02, 1.00); break;
+        case 32: lightColor = normalize(blackbody(2000));          break;
+        case 37: lightColor = normalize(blackbody(3500)); break;
+		case 39: lightColor = vec3(0.02, 1.0, 0.02); break;
+        case 40: lightColor = vec3(1.0, 0.9, 1.0); break;
+        case 41: lightColor = vec3(0.01); break;
+        case 42: lightColor = normalize(blackbody(1000)); break;
+        case 43: lightColor = vec3(0.2, 0.5, 1.0); break;
     }
-    
-    return mat;
+
+    switch (blockID) {
+        case 31: attenuation = 0.0; break;
+        case 175: attenuation = 0.0; break;
+        case 176: attenuation = 0.0; break;
+        case 177: attenuation = 0.0; break;
+    }
+
+    attenuation = IsEmitter(blockID) || IsWater(blockID) ? 0.0 : attenuation;
+
+	return vec4(lightColor, attenuation);
 }
 
-// ============================================================================
-// Identify Material from Block/Texture Properties
-// ============================================================================
-int identifyMaterial(vec3 albedo, float brightness, vec3 normal) {
-    // Simple heuristic-based material identification
-    // Can be extended with texture name matching in the future
-    
-    // High brightness → emissive
-    if (brightness > 0.9) {
-        return MAT_EMISSIVE;
+vec3 GetEmitterMask(vec3 albedo, int blockID) {
+    vec3 newAlbedo = vec3(0.0);
+
+    switch (blockID) {
+        default: newAlbedo = pow(RGBToLuma(albedo), 8.0) * albedo * 50.0 + albedo * 0.5; break;
+        case 35: newAlbedo = pow(RGBToLuma(albedo), 8.0) * albedo * 500.0; break;
+        case 42: newAlbedo = albedo * PI; break;
+        case 43: newAlbedo = albedo * LIGHTNING_BOLT_LUMINANCE; break;
     }
-    
-    // Blue tint + low roughness → water or glass
-    if (albedo.b > albedo.r * 1.2 && albedo.b > albedo.g) {
-        return MAT_GLASS;
-    }
-    
-    // Green + subsurface → leaves
-    if (albedo.g > albedo.r && albedo.g > albedo.b) {
-        return MAT_LEAF;
-    }
-    
-    // Default to stone
-    return MAT_STONE;
+
+    return newAlbedo;
+
 }
 
-// ============================================================================
-// Decode Full Material from Textures
-// ============================================================================
-Material decodeMaterial(
-    sampler2D albedoMap,
-    sampler2D specularMap,
-    sampler2D normalMap,
-    vec2 uv,
-    vec3 tangent,
-    vec3 bitangent,
-    vec3 normal
-) {
-    Material mat;
-    
-    // Sample albedo
-    mat.albedo = texture(albedoMap, uv).rgb;
-    
-    // Sample specular map
-    vec4 specData = readSpecularMap(specularMap, uv);
-    mat.roughness = specData.r;
-    mat.metallic = specData.g;
-    mat.specular = specData.b;
-    mat.emission = vec3(specData.a);
-    
-    // Sample normal
-    mat.normal = readNormalMap(normalMap, uv, tangent, bitangent, normal);
-    
-    // Default subsurface
-    mat.subsurface = 0.0;
-    
-    return mat;
-}
-
-#endif // MATERIAL_SYSTEM
+#endif // _MATERIALS_GLSL_

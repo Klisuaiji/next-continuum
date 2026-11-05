@@ -13,22 +13,6 @@ profile.HIGH=高
 profile.EXTREME=极高
 profile.EXTREME.comment=最高质量，启用所有实验性功能
 
-# Phase 2: 视觉风格配置
-profile.VISUAL_STYLE_NATURAL=自然
-profile.VISUAL_STYLE_VIVID=鲜艳
-profile.VISUAL_STYLE_CINEMATIC=电影
-profile.VISUAL_STYLE_MOODY=情绪
-profile.VISUAL_STYLE_NORDIC=北欧
-profile.VISUAL_STYLE_NEUTRAL=中性
-
-# Phase 2: 水体预设配置
-profile.WATER_PRESET_NATURAL=自然
-profile.WATER_PRESET_CLEAR=清澈
-profile.WATER_PRESET_DEEP=深海
-profile.WATER_PRESET_TURQUOISE=绿松石
-profile.WATER_PRESET_MURKY=浑浊
-profile.WATER_PRESET_CUSTOM=自定义
-
 #旧档位（保留参考）
 #profile.POTATO=马铃薯
 #profile.MINIMUM=最低
@@ -81,63 +65,14 @@ screen.WATER_SETTINGS=水面设置
 screen.VLIGHT_OVERWORLD=主世界雾设置
 screen.VLIGHT_NETHER=下界雾设置
 screen.VLIGHT_END=末地雾设置
-screen.DIMENSION=维度设置
-screen.DIMENSION.comment=维度专属大气和光照
 
 # Camera Settings
 value.CAMERA_MODE.CAMERA_AUTO=自动
 value.CAMERA_MODE.CAMERA_MANUAL=手动
 
 option.INFO=Continuum 2.0 Redux
-option.INFO.comment=Continuum 2.0 Redux - Phase 2 色彩管理
 value.INFO.0=作者：uvraj
 value.INFO.1=作者：uvraj
-
-# Phase 2: 视觉风格与水体预设选项
-option.VISUAL_STYLE=视觉风格
-option.VISUAL_STYLE.comment=色彩分级预设，控制饱和度、对比度、色调和氛围。与性能设置独立。
-value.VISUAL_STYLE.0=自然
-value.VISUAL_STYLE.1=鲜艳
-value.VISUAL_STYLE.2=电影
-value.VISUAL_STYLE.3=情绪
-value.VISUAL_STYLE.4=北欧
-value.VISUAL_STYLE.5=中性
-
-option.WATER_PRESET=水体预设
-option.WATER_PRESET.comment=水体光学属性，包括吸收、散射、波浪高度和泡沫。与视觉风格独立。
-value.WATER_PRESET.0=自然
-value.WATER_PRESET.1=清澈
-value.WATER_PRESET.2=深海
-value.WATER_PRESET.3=绿松石
-value.WATER_PRESET.4=浑浊
-value.WATER_PRESET.5=自定义
-
-# Phase 2: 旧版快速滤镜（向后兼容）
-option.QUICK_FILTER=快速滤镜（旧版）
-option.QUICK_FILTER.comment=旧版快速滤镜。新配置请分别使用视觉风格和水体预设。
-value.QUICK_FILTER.0=自然
-value.QUICK_FILTER.1=鲜艳
-value.QUICK_FILTER.2=电影
-value.QUICK_FILTER.3=情绪
-value.QUICK_FILTER.4=清澈水体
-
-# Phase 3: PBR 材质选项
-option.TEXTURE_FORMAT=PBR 纹理格式
-option.TEXTURE_FORMAT.comment=选择 labPBR 纹理格式。Vanilla=无 PBR，labPBR=完整 1.3，Legacy=旧格式
-value.TEXTURE_FORMAT.0=原版
-value.TEXTURE_FORMAT.1=labPBR 1.3
-value.TEXTURE_FORMAT.2=旧版
-
-# Phase 4-6: 实验性选项
-option.AO_GTAO=GTAO（真实环境光遮蔽）
-option.AO_GTAO.comment=启用高质量真实环境光遮蔽
-option.HIZ_SSR=HiZ 屏幕空间反射
-option.HIZ_SSR.comment=启用层次 Z 缓冲加速的 SSR
-option.SSGI_ENABLED=SSGI（屏幕空间全局光照）
-option.SSGI_ENABLED.comment=实验性屏幕空间全局光照（仅 EXTREME 档位）
-option.aoRadius=AO 半径
-option.aoSamples=AO 样本数
-option.giRays=GI 射线数
 
 option.CAMERA_MODE=相机模式
 option.CAMERA_MODE.comment=相机工作模式。"自动"最适合游戏（相机自行调节）；"手动"适合截图与视频（需要精确控制时）。

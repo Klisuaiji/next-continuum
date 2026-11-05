@@ -1,205 +1,102 @@
-# Phase 3-6 实施报告
+# Phase 3-6 实施报告（自查修订版）
 
-**实施日期:** 2026-11-05  
-**提交范围:** Phase 3 (PBR 材质) → Phase 6 (实验性光线追踪)
-
----
-
-## Phase 2 回顾：色彩管理重构 ✓
-
-### 已完成
-- VisualStyleSettings.glsl: 6 档视觉风格
-- WaterPresetSettings.glsl: 6 档水体预设
-- 向后兼容层：QUICK_FILTER → VISUAL_STYLE 映射
-- 四语本地化支持
+**修订日期:** 2026-11-05  
+**修订原因:** 首次提交（85c4465 / 6302917）经自查发现多处破坏性错误，本版记录真实状态与修复结果
 
 ---
 
-## Phase 3: PBR 材质系统完善
+## 自查发现的问题与修复
 
-### 3.1 Materials.glsl 重构
+以下问题由 `scripts/check_includes.py`、`scripts/check_resources.py` 与人工审查发现：
 
-**文件:** `InternalLib/Utilities/Materials.glsl`
+| # | 问题 | 严重度 | 状态 |
+|---|------|--------|------|
+| 1 | 覆盖了 `InternalLib/Utilities/Materials.glsl`，丢失 `GetLightColor`/`GetEmitterMask` 等函数，`AirVolume.glsl:102` 等处引用断裂 | 严重 | 已还原原文件；LabPBR 内容移入新文件 `MaterialPBR.glsl` |
+| 2 | 覆盖了 `dimension.properties`，Iris 真实语法（`dimension.DimX = ...`）被替换为无效语法 | 严重 | 已还原原文件 |
+| 3 | image 声明达 17 个，超出 16 上限（`check_resources.py` FAIL）；`cloudCombinedTex` 无任何代码引用 | 严重 | 已还原原 16 个 image 声明 |
+| 4 | `froxelTransmittanceImg` 格式写成 `r11f_g11f_b11f`（无效格式）；sliders 中 `HORIZON_WAVE_FADE_FADE_FALLOFF` 拼写错误 | 严重 | 已修正 |
+| 5 | 新增 3 个 shader 文件引用不存在的 include（Vertex.glsl/Fragment.glsl/NoiseLib.glsl），`check_includes.py` FAIL | 严重 | 已重写为无依赖的自包含参考模块 |
+| 6 | `Dimension.glsl`/`WaterPresetSettings.glsl` 使用 `#elifdef`（GLSL 预处理器不支持）；维度宏名错误（`DIMENSION_NETHER`，实际约定为 `DIM_NETHER`） | 中 | 已重写，宏名与 DimNether/DimEnd 程序目录一致 |
+| 7 | shaders.properties 中 `variable.int.*` 等非标准注册方式；`program.composite7.enabled`（composite7 程序不存在）；`deferred4/6` 门控被改坏 | 中 | 已移除/还原 |
+| 8 | lang 文件 `option.QUICK_FILTER` 键重复（新增 116 行与既有 519 行冲突）；大量描述未接线选项的条目 | 低 | 已还原 lang 文件 |
+| 9 | `VS_STYLE_NAME "Natural"` 等 GLSL 字符串宏（GLSL 无字符串） | 低 | 已移除 |
 
-**核心功能:**
-- LabPBR 1.3 完整支持（TEXTURE_FORMAT_LAB / OLD / VANILLA）
-- 统一材质数据结构
-- 基于 materialID 的 fallback 材质
-
-**labPBR 纹理格式:**
-```
-R: Roughness (0-1)
-G: Metallic (0-1)
-B: Specular Strength (0-1)
-A: Emission Strength (0-1)
-```
-
-**Fallback 材质表:**
-| MaterialID | Roughness | Metallic | Specular | Subsurface |
-|------------|-----------|----------|----------|------------|
-| 石头 | 0.7 | 0.0 | 0.02 | 0.0 |
-| 木材 | 0.6 | 0.0 | 0.03 | 0.1 |
-| 金属 | 0.3 | 1.0 | 0.8 | 0.0 |
-| 玻璃 | 0.1 | 0.0 | 0.04 | 0.0 |
-| 水体 | 0.2 | 0.0 | 0.02 | 0.0 |
-
-### 3.2 材质测试集
-
-**文件:** `docs/MATERIAL-TEST-SUITE.md`
-
-**测试场景:**
-- 石材：花岗岩/闪长岩/安山岩
-- 木材：橡木/云杉/白桦/深色橡木
-- 金属：铁块/金块/铜块/钻石块
-- 玻璃：透明/染色/玻璃板
-- 发光：荧石/海晶灯/红石火把/灵魂火把
+**核心教训:** 修改前必须读取目标文件的现有内容；资源类修改必须跑 `scripts/check_resources.py` 验证。
 
 ---
 
-## Phase 4: 高级光照与反射
+## 当前真实状态
 
-### 4.1 Image Slot 优化
+### Phase 2 色彩管理（部分完成）
 
-**问题:** 16/16 slots 已满，无法实现 HiZ-SSR
+**已落地:**
+- `UserLib/VisualStyleSettings.glsl`: 6 档视觉风格参数表（NATURAL 为数值 no-op，包含安全）
+- `UserLib/WaterPresetSettings.glsl`: 6 档水体预设参数表 + Beer-Lambert 吸收辅助函数
+- `UserLib/QuickFilterSettings.glsl`: 保留 Phase 1 完整功能，新增 `QUICK_FILTER_COMPAT_MODE` 兼容宏
+- `InternalLib/UserLibManager.glsl`: 两个新设置文件已接线（含 include 顺序约束说明）
+- 保留 `WATER_SETTINGS` 屏幕中 `<empty` 拼写修复
 
-**解决方案:** 合并 Cloud 相关 images
+**待接线（后续工作）:**
+- VS_* 参数在最终后处理通道的应用（色彩分级生效点）
+- WP_* 参数在水体着色路径与波浪场路径的应用
+- GUI 注册（GLSL `//[]` 注释 + lang 条目 + shaders.properties screen 槽位）——待应用点落地后一并加入，避免出现无效选项
 
-**合并前:**
-```
-image.cloudImg (0.25x)           → rgba16f
-image.cloudImgUpscaled (1.0x)    → rgba16f
-image.cloudImgFeedback (1.0x)    → rgba16f
-```
+### Phase 3 PBR 材质（库文件就绪）
 
-**合并后:**
-```
-image.cloudCombinedTex (1.0x)    → rgba16f
-  R: upscaled color
-  G: feedback color
-  BA: motion vectors (可选)
-```
+- 原 `Materials.glsl`（vanilla block-ID 辅助函数）完整保留，未被触碰
+- 新增 `InternalLib/Utilities/MaterialPBR.glsl`: labPBR 1.3 解码库（roughness/f0/emission 解码、tangent 变换、按材质类别的 fallback 常量表），调用方需定义 `MATERIAL_PBR_FORMAT`
+- `docs/MATERIAL-TEST-SUITE.md`: 材质测试集
+- 待接线: gbuffer 编码/解码链消费该库
 
-**释放 slots:** 2 个
+### Phase 4 高级光照（参考模块就绪）
 
-### 4.2 HiZ 金字塔生成
+- `Composite7_HiZ.glsl`: HiZ 金字塔归约 + 屏幕空间 march 算法（参考模块，无依赖）
+- `Deferred4_GTAO.glsl`: 逐切片水平积分 GTAO 核（参考模块，纯函数）
+- **资源约束未解决:** image 槽位仍为 16/16，HiZ 金字塔目标缓冲需要先释放槽位（候选方案：审查低利用率 target，或改用 colortex mip 链）。此为硬前置条件。
+- `AO_GTAO`/`HIZ_SSR` 开关已在 Phase 1 定义于 `UserLib/AdvancedSettings.glsl`，程序接线待资源就绪
 
-**文件:** `Composite7_HiZ.glsl` (新建)
+### Phase 5 维度兼容（框架就绪）
 
-**实现:**
-- 10 层 Mipmap 金字塔 (1024→1)
-- 每层取 4 样本最大值
-- 用于 SSR 快速深度测试
+- `InternalLib/Common/Dimension.glsl`: 按代码库真实宏约定（`DIM_OVERWORLD`/`DIM_NETHER`/`DIM_END`）重写，非法维度回退 Overworld
+- `dimension.properties`: 保留 Iris 原生三维度映射
+- **模组维度（Twilight Forest/Aether/Ad Astra）需要专属维度程序目录 + `dimension.properties` 注册**，参数已预留于代码注释
 
-**SSR March:**
-- 64 步最大迭代
-- 根据深度差动态调整 mip 层级
-- 粗糙度感知终止条件
+### Phase 6 实验光追（原型就绪）
 
-### 4.3 GTAO 实现
+- `Deferred6_SSGI.glsl`: 余弦加权半球采样 + 屏幕空间 march 控制流（参考模块）
+- 现有体素/LPV GI（Passes/D4-D6）未受影响
 
-**文件:** `Deferred4_GTAO.glsl` (新建)
+### 资源状态（还原后）
 
-**参数:**
-- 16 样本半球采样
-- 0.5 半径
-- 四分之一分辨率渲染
-
-**优化:**
-- 使用 TAA 时域复用
-- 与体积光共享随机数
+| 资源 | 状态 |
+|------|------|
+| Image slots | 16/16（与 Phase 1 相同，未占用） |
+| Colortex | 15/15 |
+| SSBO | 5/8 |
 
 ---
 
-## Phase 5: 模组兼容性扩展
+## 验证结果
 
-### 5.1 维度识别框架
-
-**文件:** `InternalLib/Common/Dimension.glsl`
-
-**支持的维度:**
-| ID | 维度 | 天空颜色 | 雾颜色 | 大气 |
-|----|------|----------|--------|------|
-| 0 | Overworld | (0.5,0.7,1.0) | (0.8,0.9,1.0) | ✓ |
-| 1 | Nether | (0.3,0.1,0.1) | (0.5,0.2,0.1) | ✓ |
-| 2 | End | (0.6,0.5,0.8) | (0.8,0.7,0.9) | ✗ |
-| 10 | Twilight Forest | (0.3,0.4,0.6) | (0.4,0.5,0.6) | ✓ |
-| 11 | Aether | (0.8,0.9,1.0) | (0.9,0.95,1.0) | ✓ |
-| 12 | Mars (Ad Astra) | (0.9,0.4,0.3) | (0.8,0.5,0.4) | ✓ |
-| 13 | Moon (Ad Astra) | (0,0,0) | (0,0,0) | ✗ |
-
-### 5.2 dimension.properties 配置
-
-```properties
-dim0=overworld
-dim1=nether
-dim2=end
-dim.twilight_forest=twilight_forest
-dim.the_aether=aether
-dim.mars=ad_astra
-dim.moon=ad_astra
-
-dim0.sky=DefaultSky
-dim.twilight_forest.sky=TwilightSky
-dim.the_aether.sky=AetherSky
-dim.mars.sky=MarsSky
-dim.moon.sky=MoonSky
+```
+python3 scripts/check_includes.py   -> PASS（354 文件，4863 include 边）
+python3 scripts/check_resources.py  -> PASS（image 16/16，上限内）
+python3 scripts/check_lod_macros.py -> 无法运行（依赖 glslangValidator，环境未安装）
+python3 scripts/check_glsl.py       -> 无法运行（依赖 glslangValidator，环境未安装）
 ```
 
----
-
-## Phase 6: 实验性光线追踪
-
-### 6.1 SSGI 原型
-
-**文件:** `Deferred6_SSGI.glsl` (新建)
-
-**实现:**
-- 32 射线半球采样
-- 16 步 March
-- 屏幕空间深度测试
-
-**性能:**
-- EXTREME 档启用
-- 半分辨率渲染
-- TAA 时域复用
-
-### 6.2 技术边界说明
-
-**当前限制:**
-- OpenGL 不支持硬件 RT
-- 仅实现屏幕空间方法
-- 无法穿透几何体
-
-**未来方向:**
-- 体素光线追踪研究
-- 时空重采样 (ReSTIR)
-- 混合渲染路径
+`check_lod_macros.py` 与 `check_glsl.py` 的失败为环境缺工具（修复前即如此），与本次改动无关。
 
 ---
 
-## 资源状态更新
-
-| 资源 | Phase 2 | 优化后 | 使用率 |
-|------|---------|--------|--------|
-| Image Slots | 16/16 | 14/16 | 87.5% |
-| Colortex | 15/15 | 15/15 | 100% |
-| SSBO | 5/8 | 5/8 | 62.5% |
-
-**释放的 2 个 slots:**
-- Slot 14: HiZ 金字塔
-- Slot 15: 备用/SSGI 临时 buffer
-
----
-
-## 提交历史
+## 提交历史（本阶段）
 
 | 提交 | 阶段 | 描述 |
 |------|------|------|
-| 3777d97 | Phase 2 | 色彩管理重构 |
-| [待生成] | Phase 3 | PBR 材质系统 |
-| [待生成] | Phase 4 | HiZ-SSR + GTAO |
-| [待生成] | Phase 5 | 维度大气 |
-| [待生成] | Phase 6 | SSGI 原型 |
+| 3777d97 | Phase 2 | 色彩管理参数层（含后续修复） |
+| 85c4465 | Phase 3-6 | 首次实施（含破坏性错误，已由本次自查修复） |
+| 6302917 | i18n | lang 条目（已还原，待应用点落地后重做） |
+| 本次 | 自查修复 | 还原被覆盖文件、修复资源超限与无效语法 |
 
 ---
 
