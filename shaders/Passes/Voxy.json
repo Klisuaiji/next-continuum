@@ -38,7 +38,10 @@
         "darknessFactor",
         "eyeAltitude",
         "vxModelViewInv",
+        "vxProj",
         "vxProjInv",
+        "vxProjPrev",
+        "vxRenderDistance",
         "viewWidth",
         "viewHeight"
     ], 
@@ -53,7 +56,9 @@
     }",
     "samplers": [
         "waveTex",
-        "noisetex"
+        "noisetex",
+        "vxDepthTexOpaque",
+        "vxDepthTexTrans"
     ]
 }
 
