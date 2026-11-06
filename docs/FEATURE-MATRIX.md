@@ -1,7 +1,7 @@
 # Next Continuum 功能实现状态矩阵
 
-**文档版本:** 1.0  
-**更新日期:** 2026-11-05  
+**文档版本:** 1.1  
+**更新日期:** 2026-11-06  
 **项目仓库:** https://github.com/Klisuaiji/next-continuum
 
 ---
@@ -81,8 +81,8 @@
 | Material AO（材质 AO） | **PARTIAL** | 需验证读取 |
 | Height（高度图） | **IMPLEMENTED** | POM 基础 |
 | Parallax Occlusion Mapping（POM） | **IMPLEMENTED** | 可调 POM 深度 |
-| Subsurface Scattering（SSS） | **PLANNED** | Phase 3 任务 |
-| LabPBR 完整支持 | **PARTIAL** | 需建立材质测试集 |
+| Subsurface Scattering（SSS） | **PLANNED** | Phase 3 任务；MaterialPBR.glsl 已含 labPBR SSS 因子解码 |
+| LabPBR 完整支持 | **PARTIAL** | 解码库 MaterialPBR.glsl 就绪（labPBR 1.3，调用方需定义 MATERIAL_PBR_FORMAT），调用方待接线 |
 
 ### 6. 大气与环境
 
@@ -141,7 +141,7 @@
 | 模组 | 状态 | 备注 |
 |------|------|------|
 | Distant Horizons | **IMPLEMENTED** | LOD 地形/水体/阴影 |
-| Voxy | **IMPLEMENTED** | LOD 地形/透明层 |
+| Voxy | **IMPLEMENTED** | LOD 地形/透明层；voxy.json 接口已补齐 LodSupport 依赖（提交 e65fe5b） |
 | Roxy（NeoForge Voxy） | **IMPLEMENTED** | 1.21.1 线 |
 | Twilight Forest | **PLANNED** | Phase 5 任务 |
 | Aether | **PLANNED** | Phase 5 任务 |
@@ -153,8 +153,8 @@
 
 | 功能模块 | 状态 | 备注 |
 |---------|------|------|
-| HiZ SSR | **PLANNED** | Phase 4，需 image slot |
-| SSGI（屏幕空间 GI） | **PLANNED** | Phase 4 |
+| HiZ SSR | **PLANNED** | Phase 4，需 image slot；HiZ 金字塔参考模块已就绪（Composite7_HiZ.glsl，REFERENCE ONLY） |
+| SSGI（屏幕空间 GI） | **EXPERIMENTAL** | Phase 4/6；Deferred6_SSGI.glsl 参考模块就绪，未接线 |
 | Voxel Ray Tracing | **PLANNED** | Phase 6，长期研究 |
 | Hardware RT | **UNSUPPORTED** | 当前 Iris/OpenGL 接口不支持 |
 | Path Tracing | **UNSUPPORTED** | 当前 Iris/OpenGL 接口不支持 |
@@ -174,38 +174,43 @@
 - [ ] 时间帧复用（待 motion vectors）
 - [ ] TAA 改进（待历史帧处理）
 
-### 🔄 Phase 2（色彩管理）- 完成度 90%
+### 🔄 Phase 2（色彩管理）- 完成度 95%
 
 - [x] HDR 色彩管线（基础实现）
 - [x] 曝光流程统一（自动/手动）
 - [x] ACES / Filmic / LUT 整理
 - [x] 快速滤镜色彩预设
-- [ ] 快速滤镜拆分为视觉风格 + 水体预设
-- [ ] 新增 Nordic/Neutral 风格
+- [x] 快速滤镜拆分为视觉风格 + 水体预设（参数层：VisualStyleSettings.glsl 6 档 + WaterPresetSettings.glsl 6 档 + QuickFilter 兼容宏，提交 3777d97）
+- [x] 新增 Nordic/Neutral 风格（参数层）
+- [ ] 视觉风格/水体预设应用点接线（光照、雾、水体模块消费参数）
+- [ ] GUI 注册与 lang 条目恢复（lang 已回退至 46fc79a 基线，避免暴露无效选项）
 - [ ] 多维度色彩表现验证
 
-### 📋 Phase 3（PBR 材质）- 完成度 50%
+### 📋 Phase 3（PBR 材质）- 完成度 65%
 
-- [ ] 完整 LabPBR 核验
+- [x] LabPBR 1.3 解码库（MaterialPBR.glsl：法线/高光/emissive/porosity/SSS 因子，零依赖可测试）
 - [x] 材质通道解码（基础）
+- [x] 材质测试集文档（MATERIAL-TEST-SUITE.md）
+- [ ] 解码库接入现有 gbuffers/deferred 链路并回归验证
 - [ ] F0/Roughness/Normal/Emission 完善
 - [ ] 材质回退策略
 - [ ] POM 优化
-- [ ] 材质测试集建立
 
-### 📋 Phase 4（高级光照）- 完成度 30%
+### 📋 Phase 4（高级光照）- 完成度 40%
 
-- [ ] GTAO 完善
-- [ ] HiZ SSR
-- [ ] SSGI
+- [x] GTAO 参考模块（Deferred4_GTAO.glsl，REFERENCE ONLY）
+- [x] SSGI 参考模块（Deferred6_SSGI.glsl，REFERENCE ONLY）
+- [x] HiZ 金字塔参考模块（Composite7_HiZ.glsl，REFERENCE ONLY）
+- [ ] 参考模块接线（阻塞：image slots 16/16 满，HiZ 金字塔无 mipmapped 目标）
 - [ ] 体积雾优化
 - [ ] 体积云质量提升
 - [ ] 阴影与间接光照协调
 - [ ] 光照能量与曝光校准
 
-### 📋 Phase 5（模组兼容）- 完成度 20%
+### 📋 Phase 5（模组兼容）- 完成度 30%
 
-- [x] Distant Horizons / Voxy
+- [x] Distant Horizons / Voxy（含 LodSupport 抽象层与 voxy.json 接口对齐，e65fe5b）
+- [x] 维度参数框架重写（Dimension.glsl，对齐 DIM_OVERWORLD/DIM_NETHER/DIM_END 真实宏约定）
 - [ ] Twilight Forest
 - [ ] Aether
 - [ ] Ad Astra
@@ -213,10 +218,10 @@
 - [ ] Physics Mod
 - [ ] 更多自定义维度
 
-### 📋 Phase 6（光线追踪）- 完成度 0%
+### 📋 Phase 6（光线追踪）- 完成度 25%
 
-- [ ] HiZ 屏幕空间追踪
-- [ ] SSGI
+- [x] HiZ 屏幕空间追踪（参考模块就绪，接线被 image slot 阻塞）
+- [x] SSGI（参考模块就绪）
 - [ ] 体素光线追踪研究
 - [ ] 硬件 RT 接口评估
 - [ ] 独立实验分支
@@ -234,15 +239,16 @@
 
 ### 中优先级
 
-5. **快速滤镜职责不独立** - 同时影响色彩和水体，需拆分
-6. **PBR 材质解码不完整** - 需验证所有通道
-7. **维度专属大气不完善** - 仅主世界完整
+5. **快速滤镜职责不独立** - 已拆分（参数层完成，应用点待接线）
+6. **PBR 材质解码不完整** - 解码库已就绪，待接入链路验证
+7. **维度专属大气不完善** - 仅主世界完整；Dimension.glsl 参数框架已对齐真实宏约定
+8. **Phase 2-6 参数层/库层与消费方脱节** - GUI/lang 已回退避免暴露无效选项；应用点接线是下一个里程碑
 
 ### 低优先级
 
-8. **本地化术语需统一** - 部分翻译需核对
-9. **性能档位命名优化** - EXTREME 中文名可能需调整
-10. **文档与代码同步** - 需定期更新状态矩阵
+9. **本地化术语需统一** - 部分翻译需核对
+10. **性能档位命名优化** - EXTREME 中文名可能需调整
+11. **文档与代码同步** - 需定期更新状态矩阵
 
 ---
 
@@ -330,4 +336,4 @@ colortex0-14 全部占用
 ---
 
 **文档维护:** 每次功能状态变化时更新此矩阵  
-**最后更新:** 2026-11-05（提交 b653d8f 后）
+**最后更新:** 2026-11-06（提交 e65fe5b 后；Phase 2-6 自查修复 ff92dee + Voxy 接口对齐）
