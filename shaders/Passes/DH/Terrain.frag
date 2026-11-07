@@ -1,7 +1,9 @@
 // ============================================================
-// Next Continuum · Distant Horizon LOD 地形片元程序（Iris DH 接口）
-// 使用 Iris DHTerrainTransformer 注入的 dh_sampleTexture() /
-// dh_hasTexture()，不把 DH 顶点 UV 当作普通方块图集 UV。
+// Continua 1.0 · Distant Horizons LOD 地形片元程序（Iris 1.21.1）
+// Iris 1.8.x 不提供 DH 纹理 API：dh_hasTexture() / dh_sampleTexture()
+// 属于新版 Iris 的 DISTANT_HORIZONS_TEXTURES 分支（该宏在本平台不存在）。
+// DH 顶点数据已把方块颜色烘焙进 gl_Color，因此直接以顶点色作为 albedo，
+// 与 Complementary Reimagined 的 dh_terrain 实现一致。
 // 输出映射与普通地形一致：colortex0 / colortex1 / colortex8。
 // ============================================================
 #include "../../InternalLib/Utilities.glsl"
@@ -12,8 +14,7 @@ varying vec2 dh_lmcoord;
 varying vec3 dh_worldNormal;
 
 void main() {
-    vec4 lodTexel = dh_hasTexture() ? dh_sampleTexture() : vec4(1.0);
-    vec4 baseColor = lodTexel * dh_color;
+    vec4 baseColor = dh_color;
     if (baseColor.a < 0.1) discard;
 
     #ifdef WHITE_WORLD

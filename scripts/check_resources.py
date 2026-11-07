@@ -98,6 +98,59 @@ def main():
     used = sorted({int(m) for m in re.findall(r'colortex(\d+)', props)}, reverse=False)
     print(f'[resources] shaders.properties 涉及 colortex 槽位: {used}')
 
+    # 6) properties 必须纯 ASCII
+    # Iris 用 JCPP 对 *.properties 做 C 预处理；非 ASCII 字符会抛
+    # InternalException "Bad token"，导致整份条件选项静默失效。
+    non_ascii = 0
+    for dirpath, _, names in os.walk(shader_root):
+        for n in names:
+            if not n.endswith('.properties'):
+                continue
+            p = os.path.join(dirpath, n)
+            with open(p, encoding='utf-8', errors='replace') as f:
+                for ln, line in enumerate(f, 1):
+                    if any(ord(c) > 127 for c in line):
+                        errors += fail(f'{p}:{ln} 含非 ASCII 字符（JCPP 预处理会抛 Bad token）: {line.strip()[:70]}')
+                        non_ascii += 1
+    if non_ascii == 0:
+        print('[resources] *.properties 纯 ASCII 检查通过')
+
+    # 7) customTexture / texture 路径必须真实存在（zipfs 大小写敏感）
+    # 实例案例：colorLookup3D.DAT 声明、实际文件 colorLookup3D.dat → NoSuchFileException
+    tex_paths = re.findall(r'^(?:customTexture|texture)\.[\w.]+\s*=\s*(\S+)', props, re.M)
+    tex_missing = 0
+    for rel in tex_paths:
+        target = os.path.join(shader_root, rel.lstrip('/').replace('/', os.sep))
+        # 必须按精确文件名比对：Windows 文件系统大小写不敏感，但 Iris 从 zipfs
+        # 读取时区分大小写，os.path.isfile() 会把 .DAT / .dat 误判为存在。
+        parent, base = os.path.split(target)
+        if not os.path.isfile(target) or base not in os.listdir(parent):
+            errors += fail(f'纹理文件不存在或大小写不符: {rel}')
+            tex_missing += 1
+    print(f'[resources] 纹理路径校验 {len(tex_paths)} 条，缺失 {tex_missing}')
+
+    # 8) DH 程序只允许调用目标 Iris 版本实际注入的函数
+    # Iris 1.8.x(1.21.1) 不注入任何 dh_* 函数；dh_hasTexture / dh_sampleTexture
+    # 属于新版 DISTANT_HORIZONS_TEXTURES 分支。升级目标平台时更新此白名单即可。
+    DH_INJECTED_FUNCTIONS = set()
+    dh_dir = os.path.join(shader_root, 'Passes', 'DH')
+    dh_bad = 0
+    if os.path.isdir(dh_dir):
+        for n in sorted(os.listdir(dh_dir)):
+            p = os.path.join(dh_dir, n)
+            if not os.path.isfile(p):
+                continue
+            with open(p, encoding='utf-8', errors='replace') as f:
+                for ln, line in enumerate(f, 1):
+                    if line.lstrip().startswith('//'):
+                        continue
+                    for fn in re.findall(r'\b(dh_\w+)\s*\(', line):
+                        if fn not in DH_INJECTED_FUNCTIONS:
+                            errors += fail(f'{p}:{ln} 调用了目标 Iris 未注入的 DH 函数 {fn}()')
+                            dh_bad += 1
+    if dh_bad == 0:
+        print(f'[resources] DH 注入函数白名单检查通过（允许 {len(DH_INJECTED_FUNCTIONS)} 个）')
+
     print('[resources] PASS' if errors == 0 else f'[resources] FAIL ({errors})')
     sys.exit(0 if errors == 0 else 1)
 
