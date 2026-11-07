@@ -1,10 +1,14 @@
-# Next Continuum
+# Continua
 
-**An experimental compatibility and porting project for Continuum 2.0 Redux.**
+**Continua 1.0 — 面向 Minecraft 1.21.1 + Iris 的写实光影包（发布版）。**
 
-Next Continuum explores the adaptation of **Continuum 2.0 Redux Build 2** to modern Minecraft environments, with a particular focus on Iris and the three maintained Minecraft lines: **1.21.1, 1.21.11 and 26.2**.
+`next-continuum` 是开发线；**Continua** 是从这条开发线冻结出的发布版名称，自 v1.0 起用于和仍在迭代的开发版本区分。两者共用同一套 `shaders/` 源码，但 Continua 1.0 只面向 **Minecraft 1.21.1 + Iris 1.8.x（Fabric / NeoForge）**，不追求多版本同步。下方三条维护线（1.21.1 / 1.21.11 / 26.2）描述的是开发线范围。
 
-The project aims to investigate rendering compatibility, shader behavior, performance, and integration challenges while developing an independent migration and compatibility workflow.
+## 路线调整：不再开发 NeoFocal Engine
+
+原先计划以自研 Java 渲染引擎（Focal Engine / NeoFocal Engine）承载 Continuum 2.1.3 的 compute 渲染图。**该路线已放弃**——逐项核验后确认 Iris 1.21.1 已原生支持 `CUSTOM_IMAGES`、`SSBO`、compute programs、`image.*`（含 3D 格式）、`bufferObject.*`、`allowConcurrentCompute` 与 `dimension.properties`，无需额外的模组侧渲染器。
+
+因此 Continua 采用纯 shaderpack 路线：把 2.1.3 / Focal 的新渲染逻辑（自动曝光 M1、体积云 V2、四档性能配置、快速滤镜、视觉风格与水体预设拆分、自定义维度映射等）**直接移植到 1.21.1 的老包基础上**，渲染管线仍由 Iris 托管。原先 NeoFocal 引擎侧的资源管理器、程序链接、GlobalUniforms、渲染图执行器与 `CompositeRenderer` mixin 等里程碑全部作废。
 
 ## Project Goals
 
@@ -41,6 +45,19 @@ This is an ongoing technical research and porting project. Compatibility, perfor
 - **Voxy integration kept as first-class** (`voxy.json` schema v1, verified against Voxy `0.2.16-beta` for 1.21.11 and `0.2.19-beta` for 26.2 — both inject `#define VOXY 2`; `shadow_voxels` and `renderScale` still planned), maintained together with **Roxy** (MIT NeoForge translation layer, the only Voxy path on 1.21.1) — see `docs/TARGET-MATRIX.md`.
 - Localization: `zh_CN` / `zh_TW` / `ja_JP` language files for the Iris settings UI (full key coverage of `en_US.lang`);
 - Static checks (include graph / resource budget / GLSL baseline diff) run in CI; all deviations from upstream are tracked in `docs/UPSTREAM-DIFF.md`.
+
+## Continua 1.0（2026-11-07）
+
+| 项 | 内容 |
+|---|---|
+| 版本 | Continua 1.0（首个可加载发布版，基于 `main @ 105e578`） |
+| 目标环境 | Minecraft 1.21.1 · Iris 1.8.x · Fabric / NeoForge |
+| 交付物 | `Continua 1.0 [MC 1.21.1][Iris].zip` |
+| 关键修复 | `shaders/InternalLib/UserLibManager.glsl` 三处 `#include` 行尾注释（Iris 报 `failed to resolve #include directive / file not found`）；`scripts/check_includes.py` 增加行尾注释检出，消除假 PASS |
+| CI 修复 | `scripts/check_glsl.py` 维度薄壳失败按内容签名归一，避免每新增维度目录产生上百条等价伪失败 |
+| 开源参考 | Photon / Alpha Piscium / Noble / Complementary（路线图 §11，仅作工程组织与实现思路参考，不复制代码，遵守各自许可证） |
+
+**已知限制**：实机验证率仍为 0%；HiZ / GTAO / SSGI 被 `image 16/16` 资源预算阻塞；`DIM_TWILIGHT` / `DIM_AETHER` / `DIM_SPACE` 尚未被 Passes 消费，自定义维度当前回退主世界环境参数；七档体系与现行四档的差异见路线图 §5。
 
 ## Upstream Project
 

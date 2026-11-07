@@ -14,6 +14,9 @@
 #include "/UserLib/VolumetricSettings.glsl"
 #include "/UserLib/WaterSettings.glsl"
 #include "/UserLib/QuickFilterSettings.glsl"
-#include "/UserLib/VisualStyleSettings.glsl"   // Phase 2: 视觉风格参数（依赖 QUICK_FILTER 兼容层，必须在 QuickFilterSettings 之后）
-#include "/UserLib/WaterPresetSettings.glsl"   // Phase 2: 水体预设参数
-#include "/UserLib/AdvancedSettings.glsl"  // Phase 1: 高级功能开关（M1-M7）
+// Phase 2: 视觉风格参数（依赖 QUICK_FILTER 兼容层，必须在 QuickFilterSettings 之后）
+#include "/UserLib/VisualStyleSettings.glsl"
+// Phase 2: 水体预设参数
+#include "/UserLib/WaterPresetSettings.glsl"
+// Phase 1: 高级功能开关（M1-M7）
+#include "/UserLib/AdvancedSettings.glsl"
